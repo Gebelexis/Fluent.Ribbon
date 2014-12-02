@@ -411,11 +411,7 @@ namespace Fluent
             if (this.DropDownPopup != null)
             {
                 this.DropDownPopup.KeyDown += this.OnDropDownPopupKeyDown;
-            }
-
-            if (this.menuPanel != null)
-            {
-                this.menuPanel.AddHandler(MouseDownEvent, new RoutedEventHandler(this.OnMenuPanelMouseDown), true);
+                this.DropDownPopup.AddHandler(MouseDownEvent, new RoutedEventHandler(this.OnDropDownPopupMouseDown), true);
             }
         }
 
@@ -439,11 +435,7 @@ namespace Fluent
             if (this.DropDownPopup != null)
             {
                 this.DropDownPopup.KeyDown -= this.OnDropDownPopupKeyDown;
-            }
-
-            if (this.menuPanel != null)
-            {
-                this.menuPanel.RemoveHandler(MouseDownEvent, new RoutedEventHandler(this.OnMenuPanelMouseDown));
+                this.DropDownPopup.RemoveHandler(MouseDownEvent, new RoutedEventHandler(this.OnDropDownPopupMouseDown));
             }
         }
 
@@ -553,7 +545,7 @@ namespace Fluent
             }
         }
 
-        private void OnMenuPanelMouseDown(object sender, RoutedEventArgs e)
+        private void OnDropDownPopupMouseDown(object sender, RoutedEventArgs e)
         {
             if (this.ClosePopupOnMouseDown)
             {

@@ -10,8 +10,8 @@
         <ResourceDictionary Source="pack://application:,,,/Fluent;component\Themes\Office2010\Controls\ScrollBarWhite.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Fluent;component\Themes\Office2010\Controls\TextBox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Fluent;component\Themes\Office2010\Controls\RibbonScrollViewer.xaml" />
-    </ResourceDictionary.MergedDictionaries>       
-    
+    </ResourceDictionary.MergedDictionaries>
+
     <Style x:Key="RibbonComboButtonStyle"
            TargetType="{x:Type Fluent:ToggleButton}">
         <Setter Property="Template"
@@ -387,8 +387,7 @@
                                                                   SnapsToDevicePixels="True"
                                                                   KeyboardNavigation.DirectionalNavigation="None"
                                                                   VerticalAlignment="Stretch"
-                                                                  BorderThickness="0,0,0,1"
-                                                                  VerticalScrollBarVisibility="Auto">
+                                                                  BorderThickness="0,0,0,1">
                                                         <Fluent:GalleryPanel x:Name="PART_GalleryPanel"
                                                                              Background="White"
                                                                              ItemContainerGenerator="{Binding ItemContainerGenerator, RelativeSource={RelativeSource TemplatedParent}}"
@@ -615,7 +614,7 @@
         <Setter Property="Template"
                 Value="{DynamicResource ComboboxControlTemplate}"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Visible" />
+                Value="Auto" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
                 Value="Disabled" />
         <Setter Property="MaxDropDownHeight"

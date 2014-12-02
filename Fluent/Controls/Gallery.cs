@@ -493,6 +493,11 @@ namespace Fluent
         #endregion
 
         #region Overrides
+
+        /// <summary>
+        /// Creates or identifies the element that is used to display the given item.
+        /// </summary>
+        /// <returns>The element that is used to display the given item.</returns>
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new GalleryItem();

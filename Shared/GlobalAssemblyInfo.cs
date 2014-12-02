@@ -17,14 +17,14 @@ using System.Windows;
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("https://github.com/fluentribbon/Fluent.Ribbon")]
 [assembly: AssemblyProduct("Fluent Ribbon Control Suite")]
-[assembly: AssemblyCopyright("Copyright © Degtyarev Daniel, Rikker Serg. 2009 - 2014")]
+[assembly: AssemblyCopyright("Copyright © 2009 - 2014 Degtyarev Daniel, Rikker Serg, Bastian Schmidt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("3.0.3.0")]
-[assembly: AssemblyFileVersion("3.0.3.0")]
+[assembly: AssemblyVersion("3.1.0.0")]
+[assembly: AssemblyFileVersion("3.1.0.0")]
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]

@@ -38,7 +38,7 @@
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="0"
                     Background="{DynamicResource TransparentBrush}">
-                <Grid Height="Auto" 
+                <Grid Height="Auto"
                       HorizontalAlignment="Right">
                     <Rectangle x:Name="rectangle"
                                StrokeThickness="0"

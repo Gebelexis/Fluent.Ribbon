@@ -13,8 +13,8 @@ namespace Fluent
     public static class ItemsSourceHelper
     {
 
-        public static void ItemsSourceChanged<T>(ObservableCollection<T> collection, DataTemplate dataTemplate, DependencyPropertyChangedEventArgs e,
-            NotifyCollectionChangedEventHandler collectionChangedHandler = null)
+        public static void ItemsSourceChanged<T>(FrameworkElement fElement, ObservableCollection<T> collection, DataTemplate dataTemplate, DependencyPropertyChangedEventArgs e,
+            NotifyCollectionChangedEventHandler collectionChangedHandler = null, Action<FrameworkElement, T, object> extraHandling = null)
             where T : DependencyObject
         {
             IEnumerable oldViewModelCollection = (IEnumerable)e.OldValue;
@@ -22,7 +22,7 @@ namespace Fluent
 
             if (collectionChangedHandler == null)
             {
-                collectionChangedHandler = (sender, args) => { ItemsSource_CollectionChanged(collection, dataTemplate, sender, args); };
+                collectionChangedHandler = (sender, args) => { ItemsSource_CollectionChanged(fElement, collection, dataTemplate, sender, args); };
             }
 
             if (oldViewModelCollection != null)
@@ -35,33 +35,60 @@ namespace Fluent
             {
                 if (newViewModelCollection is INotifyCollectionChanged)
                     ((INotifyCollectionChanged)newViewModelCollection).CollectionChanged += collectionChangedHandler;
-                ResetCollection<T>(collection, dataTemplate, newViewModelCollection);
+                collection.Clear();
+                foreach (var item in newViewModelCollection)
+                {
+                    AddTemplatedItem(fElement, collection, dataTemplate, item, collection.Count, extraHandling);
+                }
             }
         }
 
-        private static void ResetCollection<T>(ObservableCollection<T> collection, DataTemplate dataTemplate, IEnumerable viewModelCollection)
-            where T : DependencyObject
+        private static void AddTemplatedItem<T>(FrameworkElement fElelement, ObservableCollection<T> collection, DataTemplate dataTemplate, object item, int index, Action<FrameworkElement, T, object> extraHandling = null)
+             where T : DependencyObject
         {
-            collection.Clear();
-            foreach (var item in viewModelCollection)
+            if (item is T) 
             {
-                if (dataTemplate != null)
+                collection.Insert(index, (T)item);
+                return;
+            }
+            T dObject = null;
+            if (dataTemplate != null)
+            {
+                dObject = dataTemplate.LoadContent() as T;
+                if (dObject is FrameworkElement)
                 {
-                    T dObject = dataTemplate.LoadContent() as T;
+                    ((FrameworkElement)(DependencyObject)dObject).DataContext = item;
+                }
+                if (typeof(T) == typeof(QuickAccessMenuItem)) //for quickAccessitems we set the target
+                {
+                    var contentTemplate = fElelement.FindResource(new DataTemplateKey(item.GetType()));
+                    if (contentTemplate != null && contentTemplate is DataTemplate)
+                    {
+                        FrameworkElement cObject = ((DataTemplate)contentTemplate).LoadContent() as FrameworkElement;
+                        ((QuickAccessMenuItem)Convert.ChangeType(dObject, typeof(QuickAccessMenuItem))).Target = (System.Windows.Controls.Control)cObject;
+                    }
+                }
+            }
+            else
+            {
+                var defaultTemplate = fElelement.FindResource(new DataTemplateKey(item.GetType()));
+                if (defaultTemplate != null && defaultTemplate is DataTemplate)
+                {
+                    dObject = ((DataTemplate)defaultTemplate).LoadContent() as T;
                     if (dObject is FrameworkElement)
                     {
                         ((FrameworkElement)(DependencyObject)dObject).DataContext = item;
                     }
-                    collection.Add(dObject);
+                    
                 }
-                else if (item is T) //make sure a converter is used in the binding to do the translation
-                {
-                    collection.Add((T)item);
-                }                
             }
+            if (extraHandling != null)
+                extraHandling(fElelement, dObject, item);
+            if (dObject != null)
+                collection.Insert(index, dObject);
         }
 
-        public static void ItemsSource_CollectionChanged<T>(ObservableCollection<T> collection, DataTemplate dataTemplate, object sender, NotifyCollectionChangedEventArgs e)
+        public static void ItemsSource_CollectionChanged<T>(FrameworkElement fElement, ObservableCollection<T> collection, DataTemplate dataTemplate, object sender, NotifyCollectionChangedEventArgs e, Action<FrameworkElement, T, object> extraHandling = null)
             where T : DependencyObject
         {
             switch (e.Action)
@@ -70,19 +97,7 @@ namespace Fluent
                     {
                         for (var i = 0; i < e.NewItems.Count; i++)
                         {
-                            if (dataTemplate != null)
-                            {
-                                T dObject = dataTemplate.LoadContent() as T;
-                                if (dObject is FrameworkElement)
-                                {
-                                    ((FrameworkElement)(DependencyObject)dObject).DataContext = e.NewItems[i];
-                                }
-                                collection.Add(dObject);
-                            }
-                            else if (e.NewItems[i] is T) //make sure a converter is used in the binding to do the translation
-                            {
-                                collection.Add((T)e.NewItems[i]); 
-                            }
+                            AddTemplatedItem(fElement, collection, dataTemplate, e.NewItems[i], collection.Count, extraHandling);
                         }
                         break;
                     }
@@ -111,40 +126,31 @@ namespace Fluent
                             var dObject = collection[e.OldStartingIndex];
                             collection.RemoveAt(e.OldStartingIndex);
                         }
-
                         for (var i = 0; i < e.NewItems.Count; i++)
                         {
-                            if (dataTemplate != null)
-                            {
-                                T dObject = dataTemplate.LoadContent() as T;
-                                if (dObject is FrameworkElement)
-                                {
-                                    ((FrameworkElement)(DependencyObject)dObject).DataContext = e.NewItems[i];
-                                }
-                                collection.Insert(e.NewStartingIndex + i, dObject);
-                            }
-                            else if (e.NewItems[i] is T) //make sure a converter is used in the binding to do the translation
-                            {
-                                collection.Add((T)e.NewItems[i]);
-                            }
+                            AddTemplatedItem(fElement, collection, dataTemplate, e.NewItems[i], e.NewStartingIndex + i, extraHandling);
                         }
                         break;
                     }
                 case NotifyCollectionChangedAction.Reset:
                     {
-                        ResetCollection<T>(collection, dataTemplate, sender as IEnumerable);
+                        collection.Clear();
+                        foreach (var item in sender as IEnumerable)
+                        {
+                            AddTemplatedItem(fElement, collection, dataTemplate, item, collection.Count, extraHandling);
+                        }
                         break;
                     }
             }
         }
 
-        public static int SelectorItemsSource_CollectionChanged<T>(ObservableCollection<T> collection, DataTemplate dataTemplate, object sender, NotifyCollectionChangedEventArgs e, int selectedIndex)
+        public static int SelectorItemsSource_CollectionChanged<T>(FrameworkElement fElelement, ObservableCollection<T> collection, DataTemplate dataTemplate, object sender, NotifyCollectionChangedEventArgs e, int selectedIndex, Action<FrameworkElement, T, object> extraHandling = null)
             where T : DependencyObject
         {
             int currentIndex = selectedIndex;
             T currentSelected = collection[currentIndex];
 
-            ItemsSource_CollectionChanged(collection, dataTemplate, sender, e);
+            ItemsSource_CollectionChanged(fElelement, collection, dataTemplate, sender, e, extraHandling);
 
             if (collection.Count == 0)
                 selectedIndex = -1;

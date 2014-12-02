@@ -831,6 +831,9 @@ namespace Fluent
 
             RibbonControl.Bind(this, button, "MaxDropDownHeight", MaxDropDownHeightProperty, BindingMode.OneWay);
 
+            RibbonControl.Bind(this, button, "UsesItemContainerTemplate", UsesItemContainerTemplateProperty, BindingMode.OneWay);
+            RibbonControl.Bind(this, button, "ItemContainerTemplateSelector", ItemContainerTemplateSelectorProperty, BindingMode.OneWay);
+
             BindQuickAccessItemDropDownEvents(button);
 
             button.DropDownOpened += OnQuickAccessOpened;

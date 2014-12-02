@@ -995,7 +995,7 @@ namespace Fluent
             groupBox.DropDownClosed += this.OnQuickAccessClosed;
             
             groupBox.State = RibbonGroupBoxState.QuickAccess;
-
+            RibbonControl.BindQuickAccessItem(this, groupBox);
             RibbonControl.Bind(this, groupBox, "ItemTemplateSelector", ItemTemplateSelectorProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, groupBox, "ItemTemplate", ItemTemplateProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, groupBox, "ItemsSource", ItemsSourceProperty, BindingMode.OneWay);
@@ -1007,7 +1007,7 @@ namespace Fluent
             RibbonControl.Bind(this, groupBox, "LauncherToolTip", LauncherToolTipProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, groupBox, "IsLauncherEnabled", IsLauncherEnabledProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, groupBox, "IsLauncherVisible", IsLauncherVisibleProperty, BindingMode.OneWay);
-            RibbonControl.Bind(this, groupBox, "DialogLauncherButtonKeyTipKeys", DialogLauncherButtonKeyTipKeysProperty, BindingMode.OneWay);
+            RibbonControl.Bind(this, groupBox, "LauncherKeys", DialogLauncherButtonKeyTipKeysProperty, BindingMode.OneWay);
             groupBox.LauncherClick += this.LauncherClick;
 
             if (this.Icon != null)

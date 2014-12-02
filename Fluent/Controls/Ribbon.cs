@@ -2192,8 +2192,8 @@ namespace Fluent
         static void OnTabItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<RibbonTabItem>(ribbon.Tabs, ribbon.TabItemsTemplate, e,
-                (sender, args) => { Ribbon r = sender as Ribbon; r.SelectedTabIndex = ItemsSourceHelper.SelectorItemsSource_CollectionChanged(r.Tabs, r.TabItemsTemplate, r, args, r.SelectedTabIndex); });
+            ItemsSourceHelper.ItemsSourceChanged<RibbonTabItem>(ribbon, ribbon.Tabs, ribbon.TabItemsTemplate, e,
+                (sender, args) => { Ribbon r = sender as Ribbon; r.SelectedTabIndex = ItemsSourceHelper.SelectorItemsSource_CollectionChanged(r, r.Tabs, r.TabItemsTemplate, r, args, r.SelectedTabIndex); });
         }
 
         #endregion
@@ -2241,11 +2241,92 @@ namespace Fluent
         static void OnContextualTabGroupsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<RibbonContextualTabGroup>(ribbon.ContextualGroups, ribbon.ContextualTabGroupsTemplate, e);
+            ItemsSourceHelper.ItemsSourceChanged<RibbonContextualTabGroup>(ribbon, ribbon.ContextualGroups, ribbon.ContextualTabGroupsTemplate, e);
         }
 
         #endregion
 
+        #region ToolbarItemsSource
+
+        /// <summary>
+        /// Gets or sets ToolbarItemsSource
+        /// </summary>
+        public IEnumerable ToolbarItemsSource
+        {
+            get { return (IEnumerable)GetValue(ToolbarItemsSourceProperty); }
+            set { SetValue(ToolbarItemsSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for ToolbarItemsSourceSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty ToolbarItemsSourceProperty =
+            DependencyProperty.Register("ToolbarItemsSource", typeof(IEnumerable), typeof(Ribbon), new UIPropertyMetadata(null, OnToolbarItemsSourceChanged));
+
+        static void OnToolbarItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Ribbon ribbon = (Ribbon)d;
+            ItemsSourceHelper.ItemsSourceChanged<UIElement>(ribbon, ribbon.ToolBarItems, null, e);
+        }
+
+        #endregion
+
+        #region QuickAccessItemsTemplate
+
+        /// <summary>
+        /// Gets or sets QuickAccessItemsTemplate
+        /// </summary>
+        public DataTemplate QuickAccessItemsTemplate
+        {
+            get { return (DataTemplate)GetValue(QuickAccessItemsTemplateProperty); }
+            set { SetValue(QuickAccessItemsTemplateProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for QuickAccessItemsTemplate. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty QuickAccessItemsTemplateProperty =
+            DependencyProperty.Register("QuickAccessItemsTemplate", typeof(DataTemplate), typeof(Ribbon), new UIPropertyMetadata(null));
+
+        #endregion
+
+        #region QuickAccessItemsSource
+
+        /// <summary>
+        /// Gets or sets QuickAccessItemsSource
+        /// </summary>
+        public IEnumerable QuickAccessItemsSource
+        {
+            get { return (IEnumerable)GetValue(QuickAccessItemsSourceProperty); }
+            set { SetValue(QuickAccessItemsSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for QuickAccessItemsSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty QuickAccessItemsSourceProperty =
+            DependencyProperty.Register("QuickAccessItemsSource", typeof(IEnumerable), typeof(Ribbon), new UIPropertyMetadata(null, OnQuickAccessItemsSourceChanged));
+
+        static void OnQuickAccessItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Ribbon ribbon = (Ribbon)d;
+            ItemsSourceHelper.ItemsSourceChanged<QuickAccessMenuItem>(ribbon, ribbon.QuickAccessItems, ribbon.QuickAccessItemsTemplate, e, null,
+                new Action<FrameworkElement, QuickAccessMenuItem, object>((fElement, dObject, item) =>
+                {
+                    var contentTemplate = fElement.FindResource(new DataTemplateKey(item.GetType()));
+                    if (contentTemplate != null && contentTemplate is DataTemplate)
+                    {
+                        FrameworkElement cObject = ((DataTemplate)contentTemplate).LoadContent() as FrameworkElement;
+                        ((QuickAccessMenuItem)Convert.ChangeType(dObject, typeof(QuickAccessMenuItem))).Target = (System.Windows.Controls.Control)cObject;
+                    }
+                })
+            );
+        }
+
+        #endregion
     }
 
 }

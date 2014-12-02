@@ -420,7 +420,7 @@ namespace Fluent
             ComboBox combo = new ComboBox();
             RibbonControl.BindQuickAccessItem(this, combo);
             RibbonControl.Bind(this, combo, "GroupBy", ComboBox.GroupByProperty, BindingMode.OneWay);
-            RibbonControl.Bind(this, combo, "ActualWidth", ComboBox.WidthProperty, BindingMode.OneWay);
+            //RibbonControl.Bind(this, combo, "ActualWidth", ComboBox.WidthProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, combo, "InputWidth", ComboBox.InputWidthProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, combo, "ItemHeight", ComboBox.ItemHeightProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, combo, "IsEditable", ComboBox.IsEditableProperty, BindingMode.OneWay);
@@ -436,6 +436,9 @@ namespace Fluent
             RibbonControl.Bind(this, combo, "ItemTemplate", ItemTemplateProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, combo, "SelectedValuePath", SelectedValuePathProperty, BindingMode.OneWay);
             RibbonControl.Bind(this, combo, "MaxDropDownHeight", MaxDropDownHeightProperty, BindingMode.OneWay);
+
+            RibbonControl.Bind(this, combo, "ItemTemplateSelector", ItemTemplateSelectorProperty, BindingMode.OneWay);
+
             combo.DropDownOpened += OnQuickAccessOpened;
             if (IsEditable) combo.GotFocus += OnQuickAccessTextBoxGetFocus;
             quickAccessCombo = combo;

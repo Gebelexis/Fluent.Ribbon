@@ -263,16 +263,26 @@ namespace Fluent
         static void OnFilterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Gallery gallery = (Gallery)d;
-            GalleryGroupFilter filter = e.NewValue as GalleryGroupFilter;
+            GalleryGroupFilter oldFilter = e.OldValue as GalleryGroupFilter;
+            if (oldFilter != null)
+            {
+                System.Windows.Controls.MenuItem menuItem = gallery.GetFilterMenuItem(oldFilter);
+                if (menuItem != null) menuItem.IsChecked = false;
+            }
+            GalleryGroupFilter filter = e.NewValue as GalleryGroupFilter;            
             if (filter != null)
             {
                 gallery.SelectedFilterTitle = filter.Title;
                 gallery.SelectedFilterGroups = filter.Groups;
+                gallery.SelectedFilterIndex = gallery.Filters.IndexOf(filter);
+                System.Windows.Controls.MenuItem menuItem = gallery.GetFilterMenuItem(filter);
+                if (menuItem != null) menuItem.IsChecked = true;
             }
             else
             {
                 gallery.SelectedFilterTitle = "";
                 gallery.SelectedFilterGroups = null;
+                gallery.SelectedFilterIndex = -1;
             }
             gallery.UpdateLayout();
         }
@@ -346,6 +356,7 @@ namespace Fluent
         MenuItem GetFilterMenuItem(GalleryGroupFilter filter)
         {
             if (filter == null) return null;
+            if (groupsMenuButton == null) return null; 
             return groupsMenuButton.Items.Cast<MenuItem>().FirstOrDefault(item => (item != null) && (item.Header.ToString() == filter.Title));
             /*foreach (MenuItem item in groupsMenuButton.Items)
             {
@@ -576,7 +587,43 @@ namespace Fluent
         static void OnGalleryGroupFilterSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Gallery gallery = (Gallery)d;
-            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery.Filters, gallery.GalleryGroupFilterTemplate, e);
+            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, gallery.GalleryGroupFilterTemplate, e);
+        }
+
+        #endregion
+
+        #region SelectedFilterIndex
+
+        /// <summary>
+        /// Gets or sets SelectedFilterIndex
+        /// </summary>
+        public int SelectedFilterIndex
+        {
+            get { return (int)GetValue(SelectedFilterIndexProperty); }
+            set { SetValue(SelectedFilterIndexProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for SelectedFilterIndex. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty SelectedFilterIndexProperty =
+            DependencyProperty.Register("SelectedFilterIndex", typeof(int), typeof(Gallery), new UIPropertyMetadata(-1, OnSelectedFilterIndexChanged));
+
+        static void OnSelectedFilterIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Gallery gallery = (Gallery)d;
+            var selectedIndex = (int)e.NewValue;
+
+            if (selectedIndex >= 0
+                && selectedIndex < gallery.Filters.Count)
+            {
+                gallery.SelectedFilter = gallery.Filters[selectedIndex];
+            }
+            else
+            {
+                gallery.SelectedFilter = null;
+            }
         }
 
         #endregion

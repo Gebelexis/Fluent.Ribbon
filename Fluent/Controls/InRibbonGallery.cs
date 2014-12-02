@@ -26,6 +26,7 @@ namespace Fluent
     using System.Windows.Media.Imaging;
     using System.Windows.Threading;
     using Fluent.Extensibility;
+    using System.Collections;
 
     /// <summary>
     /// Represents the In-Ribbon Gallery, a gallery-based control that exposes 
@@ -411,6 +412,7 @@ namespace Fluent
             {
                 gallery.SelectedFilterTitle = filter.Title;
                 gallery.SelectedFilterGroups = filter.Groups;
+                gallery.SelectedFilterIndex = gallery.Filters.IndexOf(filter);
                 System.Windows.Controls.MenuItem menuItem = gallery.GetFilterMenuItem(filter);
                 if (menuItem != null) menuItem.IsChecked = true;
             }
@@ -418,6 +420,7 @@ namespace Fluent
             {
                 gallery.SelectedFilterTitle = "";
                 gallery.SelectedFilterGroups = null;
+                gallery.SelectedFilterIndex = -1;
             }
             gallery.UpdateLayout();
         }
@@ -1513,6 +1516,89 @@ namespace Fluent
             if ((CanCollapseToButton) && (CurrentItemsInRow < MinItemsInRow)) IsCollapsed = true;
 
             InvalidateMeasure();*/
+        }
+
+        #endregion
+
+        #region GalleryGroupFilterTemplate
+
+        /// <summary>
+        /// Gets or sets GalleryGroupFilterTemplate
+        /// </summary>
+        public DataTemplate GalleryGroupFilterTemplate
+        {
+            get { return (DataTemplate)GetValue(GalleryGroupFilterTemplateProperty); }
+            set { SetValue(GalleryGroupFilterTemplateProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for GalleryGroupFilterTemplate. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty GalleryGroupFilterTemplateProperty =
+            DependencyProperty.Register("GalleryGroupFilterTemplate", typeof(DataTemplate), typeof(InRibbonGallery), new UIPropertyMetadata(null));
+
+        #endregion
+
+        #region GalleryGroupFilterSource
+
+        /// <summary>
+        /// Gets or sets GalleryGroupFilterSource
+        /// </summary>
+        public IEnumerable GalleryGroupFilterSource
+        {
+            get { return (IEnumerable)GetValue(GalleryGroupFilterSourceProperty); }
+            set { SetValue(GalleryGroupFilterSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for GalleryGroupFilterSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty GalleryGroupFilterSourceProperty =
+            DependencyProperty.Register("GalleryGroupFilterSource", typeof(IEnumerable), typeof(InRibbonGallery), new UIPropertyMetadata(null, OnGalleryGroupFilterSourceChanged));
+
+        static void OnGalleryGroupFilterSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            InRibbonGallery gallery = (InRibbonGallery)d;
+            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, gallery.GalleryGroupFilterTemplate, e,
+                (sender, args) => { InRibbonGallery g = sender as InRibbonGallery; g.SelectedFilterIndex = ItemsSourceHelper.SelectorItemsSource_CollectionChanged(g, g.Filters, g.GalleryGroupFilterTemplate, g, args, g.SelectedFilterIndex); });
+        }
+
+        #endregion
+
+        #region SelectedFilterIndex
+
+        /// <summary>
+        /// Gets or sets SelectedFilterIndex
+        /// </summary>
+        public int SelectedFilterIndex
+        {
+            get { return (int)GetValue(SelectedFilterIndexProperty); }
+            set { SetValue(SelectedFilterIndexProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for SelectedFilterIndex. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty SelectedFilterIndexProperty =
+            DependencyProperty.Register("SelectedFilterIndex", typeof(int), typeof(InRibbonGallery), new UIPropertyMetadata(-1, OnSelectedFilterIndexChanged));
+
+        static void OnSelectedFilterIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            InRibbonGallery gallery = (InRibbonGallery)d;
+            var selectedIndex = (int)e.NewValue;
+
+            if (selectedIndex >= 0
+                && selectedIndex < gallery.Filters.Count)
+            {
+                gallery.SelectedFilter = gallery.Filters[selectedIndex];
+            }
+            else
+            {
+                gallery.SelectedFilter = null;
+            }
         }
 
         #endregion

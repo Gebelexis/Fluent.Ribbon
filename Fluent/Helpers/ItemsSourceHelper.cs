@@ -59,15 +59,6 @@ namespace Fluent
                 {
                     ((FrameworkElement)(DependencyObject)dObject).DataContext = item;
                 }
-                if (typeof(T) == typeof(QuickAccessMenuItem)) //for quickAccessitems we set the target
-                {
-                    var contentTemplate = fElelement.FindResource(new DataTemplateKey(item.GetType()));
-                    if (contentTemplate != null && contentTemplate is DataTemplate)
-                    {
-                        FrameworkElement cObject = ((DataTemplate)contentTemplate).LoadContent() as FrameworkElement;
-                        ((QuickAccessMenuItem)Convert.ChangeType(dObject, typeof(QuickAccessMenuItem))).Target = (System.Windows.Controls.Control)cObject;
-                    }
-                }
             }
             else
             {
@@ -79,7 +70,6 @@ namespace Fluent
                     {
                         ((FrameworkElement)(DependencyObject)dObject).DataContext = item;
                     }
-                    
                 }
             }
             if (extraHandling != null)

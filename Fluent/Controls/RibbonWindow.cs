@@ -23,6 +23,8 @@ namespace Fluent
 #else
     using System.Windows.Shell;
 #endif
+    using Microsoft.Win32;
+    using System.Globalization;
 
     /// <summary>
     /// Represents basic window for ribbon
@@ -98,21 +100,6 @@ namespace Fluent
         /// </summary>
         public static readonly DependencyProperty GlassBorderThicknessProperty =
             DependencyProperty.Register("GlassBorderThickness", typeof(Thickness), typeof(RibbonWindow), new UIPropertyMetadata(new Thickness(8, 50, 8, 8), OnWindowChromeRelevantPropertyChanged));
-
-        /// <summary>
-        /// Gets or sets caption height
-        /// </summary>
-        public double CaptionHeight
-        {
-            get { return (double)GetValue(CaptionHeightProperty); }
-            set { SetValue(CaptionHeightProperty, value); }
-        }
-
-        /// <summary>
-        /// Using a DependencyProperty as the backing store for CaptionHeight.  This enables animation, styling, binding, etc...
-        /// </summary>
-        public static readonly DependencyProperty CaptionHeightProperty =
-            DependencyProperty.Register("CaptionHeight", typeof(double), typeof(RibbonWindow), new UIPropertyMetadata(20.0, OnWindowChromeRelevantPropertyChanged));
 
         /// <summary>
         /// Gets or sets corner radius 
@@ -221,6 +208,8 @@ namespace Fluent
         {
             StyleProperty.OverrideMetadata(typeof(RibbonWindow), new FrameworkPropertyMetadata(null, OnCoerceStyle));
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RibbonWindow), new FrameworkPropertyMetadata(typeof(RibbonWindow)));
+
+            RibbonProperties.TitleBarHeightProperty.OverrideMetadata(typeof(RibbonWindow), new FrameworkPropertyMetadata(OnWindowChromeRelevantPropertyChanged));
         }
 
         // Coerce object style
@@ -248,6 +237,9 @@ namespace Fluent
             this.SizeChanged += this.OnSizeChanged;
 
             this.windowSizing = new WindowSizing(this);
+
+            SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
+            UpdateTitleBarHeight();
         }
 
         #endregion
@@ -286,6 +278,27 @@ namespace Fluent
         }
 
         #endregion
+
+        private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+        {
+            // When SystemsFont.MenuFont* changed
+            if (e.Category == UserPreferenceCategory.Window)
+            {
+                UpdateTitleBarHeight();
+            }
+        }
+
+        private void UpdateTitleBarHeight()
+        {
+            var fmt = new FormattedText(
+                "CANDIDATE",
+                CultureInfo.CurrentUICulture,
+                FlowDirection.LeftToRight,
+                new Typeface(SystemFonts.CaptionFontFamily, SystemFonts.CaptionFontStyle, SystemFonts.CaptionFontWeight, FontStretches.Normal),
+                SystemFonts.CaptionFontSize,
+                Brushes.Black);
+            RibbonProperties.SetTitleBarHeight(this, Math.Max(fmt.Height, RibbonProperties.MIN_TITLE_BAR_HEIGHT));
+        }
 
         private static void OnWindowChromeRelevantPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -345,7 +358,7 @@ namespace Fluent
                 WindowChrome.SetWindowChrome(this, windowChrome);
             }
 
-            windowChrome.CaptionHeight = this.CaptionHeight;
+            windowChrome.CaptionHeight = RibbonProperties.GetTitleBarHeight(this);
             windowChrome.CornerRadius = this.CornerRadius;
             windowChrome.GlassFrameThickness = this.GlassBorderThickness;
             windowChrome.ResizeBorderThickness = this.ResizeBorderThickness;

@@ -25,6 +25,12 @@
                         Style="{DynamicResource RibbonSeparatorStyle}" />
         </StackPanel>
         <ControlTemplate.Triggers>
+            <Trigger Property="IsFirstInRow"
+                     Value="False">
+                <Setter Property="Visibility"
+                        TargetName="separatorLeft"
+                        Value="Visible" />
+            </Trigger>
             <Trigger Property="IsLastInRow"
                      Value="False">
                 <Setter Property="Visibility"

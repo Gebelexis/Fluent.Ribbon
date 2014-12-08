@@ -14,6 +14,7 @@ using System.Windows.Media;
 namespace Fluent
 {
     using Fluent.Extensibility;
+    using System.Windows.Data;
 
     /// <summary>
     /// Represent panel for group box panel
@@ -82,6 +83,58 @@ namespace Fluent
         {
             get { return layoutDefinitions; }
         }
+
+        #region ChildrenSource
+
+        /// <summary>
+        /// Gets or sets ChildrenSource
+        /// </summary>
+        public IEnumerable ChildrenSource
+        {
+            get { return (IEnumerable)GetValue(ChildrenSourceProperty); }
+            set { SetValue(ChildrenSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for ChildrenSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty ChildrenSourceProperty =
+            DependencyProperty.Register("ChildrenSource", typeof(IEnumerable), typeof(RibbonToolBar), new UIPropertyMetadata(null, OnChildrenSourceChanged));
+
+        static void OnChildrenSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonToolBar ribbonToolbar = (RibbonToolBar)d;
+            ItemsSourceHelper.ItemsSourceChanged<FrameworkElement>(ribbonToolbar, ribbonToolbar.Children, e);
+        }
+
+        #endregion
+
+        #region LayoutDefinitionsSource
+
+        /// <summary>
+        /// Gets or sets LayoutDefinitionsSource
+        /// </summary>
+        public IEnumerable LayoutDefinitionsSource
+        {
+            get { return (IEnumerable)GetValue(LayoutDefinitionsSourceProperty); }
+            set { SetValue(LayoutDefinitionsSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for LayoutDefinitionsSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty LayoutDefinitionsSourceProperty =
+            DependencyProperty.Register("LayoutDefinitionsSource", typeof(IEnumerable), typeof(RibbonToolBar), new UIPropertyMetadata(null, OnLayoutDefinitionsSourceChanged));
+
+        static void OnLayoutDefinitionsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonToolBar ribbonToolBar = (RibbonToolBar)d;
+            ItemsSourceHelper.ItemsSourceChanged<RibbonToolBarLayoutDefinition>(ribbonToolBar, ribbonToolBar.LayoutDefinitions, e, null, new Converters.RibbonToolBarLayoutDefinitionConverter());
+        }
+
+        #endregion
 
         #endregion
 
@@ -354,7 +407,21 @@ namespace Fluent
         FrameworkElement GetControl(RibbonToolBarControlDefinition controlDefinition)
         {
             string name = controlDefinition.Target;
-            return Children.FirstOrDefault(x => x.Name == name);
+            FrameworkElement child = Children.FirstOrDefault(x => x.Name == name);
+            if (child == null && controlDefinition.TargetSource != null)
+                child = Children.FirstOrDefault(x => x.DataContext == controlDefinition.TargetSource);
+
+            //overwrite the size binding to point ot the control definition
+            Binding sizeBinding = new Binding("Size");
+            sizeBinding.Source = controlDefinition;
+            sizeBinding.Converter = new Fluent.Converters.EnumToEnumConverter();
+            BindingOperations.SetBinding(child, RibbonToolBarControlDefinition.SizeProperty, sizeBinding);
+
+            Binding sizeDefinitionBinding = new Binding("SizeDefinition");
+            sizeDefinitionBinding.Source = controlDefinition;
+            BindingOperations.SetBinding(child, RibbonToolBarControlDefinition.SizeDefinitionProperty, sizeDefinitionBinding);
+
+            return child;
         }
 
         Dictionary<object, RibbonToolBarControlGroup> cachedControlGroups = new Dictionary<object, RibbonToolBarControlGroup>();
@@ -511,7 +578,7 @@ namespace Fluent
                         if (measure)
                         {
                             // Apply Control Definition Properties
-                            control.IsFirstInRow = (i == 0);
+                            control.IsFirstInRow = (i == 0) || (i > 0 && row.Children[i - 1] is RibbonToolBarControlGroupDefinition);
                             control.IsLastInRow = (i == row.Children.Count - 1);
                             control.Measure(availableSize);
                         }

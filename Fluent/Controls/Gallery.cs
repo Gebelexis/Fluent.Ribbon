@@ -15,6 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 
@@ -494,12 +495,32 @@ namespace Fluent
 
         #region Overrides
 
+#if NET45
+        private object currentItem;
+#endif
         /// <summary>
         /// Creates or identifies the element that is used to display the given item.
         /// </summary>
         /// <returns>The element that is used to display the given item.</returns>
         protected override DependencyObject GetContainerForItemOverride()
         {
+#if NET45
+            var item = this.currentItem;
+            this.currentItem = null;
+
+            if (item != null)
+            {
+                var dataTemplate = this.ItemTemplate;
+                if (dataTemplate != null)
+                {
+                    var dataTemplateContent = (object)dataTemplate.LoadContent();
+                    if (dataTemplateContent is GalleryItem)
+                    {
+                        return dataTemplateContent as DependencyObject;
+                    }
+                }
+            }
+#endif
             return new GalleryItem();
         }
 
@@ -510,7 +531,16 @@ namespace Fluent
         /// <returns></returns>
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return item is GalleryItem;
+            var isItemItsOwnContainerOverride = item is GalleryItem;
+
+#if NET45
+            if (isItemItsOwnContainerOverride == false)
+            {
+                this.currentItem = item;
+            }
+#endif
+
+            return isItemItsOwnContainerOverride;
         }
 
         /// <summary>
@@ -551,26 +581,6 @@ namespace Fluent
 
         #endregion
 
-        #region GalleryGroupFilterTemplate
-
-        /// <summary>
-        /// Gets or sets GalleryGroupFilterTemplate
-        /// </summary>
-        public DataTemplate GalleryGroupFilterTemplate
-        {
-            get { return (DataTemplate)GetValue(GalleryGroupFilterTemplateProperty); }
-            set { SetValue(GalleryGroupFilterTemplateProperty, value); }
-        }
-
-        /// <summary>
-        /// Using a DependencyProperty as the backing store for GalleryGroupFilterTemplate. 
-        /// This enables animation, styling, binding, etc...
-        /// </summary>
-        public static readonly DependencyProperty GalleryGroupFilterTemplateProperty =
-            DependencyProperty.Register("GalleryGroupFilterTemplate", typeof(DataTemplate), typeof(Gallery), new UIPropertyMetadata(null));
-
-        #endregion
-
         #region GalleryGroupFilterSource
 
         /// <summary>
@@ -592,7 +602,7 @@ namespace Fluent
         static void OnGalleryGroupFilterSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Gallery gallery = (Gallery)d;
-            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, gallery.GalleryGroupFilterTemplate, e);
+            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, e, null, new Converters.GalleryGroupFilterConverter(), () => gallery.SelectedFilterIndex, index => gallery.SelectedFilterIndex = index);
         }
 
         #endregion

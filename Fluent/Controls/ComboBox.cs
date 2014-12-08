@@ -881,8 +881,6 @@ namespace Fluent
                     {
                         return dataTemplateContent as DependencyObject;
                     }
-
-                    //throw new InvalidOperationException("Invalid ItemContainer");
                 }
             }
 #endif

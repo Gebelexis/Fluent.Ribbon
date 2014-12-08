@@ -84,6 +84,33 @@ namespace Fluent
 
         #endregion
 
+        #region TargetSource Property
+
+        /// <summary>
+        /// Gets or sets name of the TargetSource control
+        /// </summary>
+        public object TargetSource
+        {
+            get { return (object)GetValue(TargetSourceProperty); }
+            set { SetValue(TargetSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for TargetSource.  
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty TargetSourceProperty =
+            DependencyProperty.Register("TargetSource", typeof(object),
+            typeof(RibbonToolBarControlDefinition), new UIPropertyMetadata(null, OnTargetSourcePropertyChanged));
+
+        static void OnTargetSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonToolBarControlDefinition definition = (RibbonToolBarControlDefinition)d;
+            definition.Invalidate("TargetSource");
+        }
+
+        #endregion
+
         #region Width Property
         
         /// <summary>

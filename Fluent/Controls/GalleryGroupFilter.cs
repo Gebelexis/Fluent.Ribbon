@@ -14,7 +14,7 @@ namespace Fluent
     /// <summary>
     /// Represents gallery group filter definition
     /// </summary>
-    public class GalleryGroupFilter : FrameworkElement
+    public class GalleryGroupFilter : DependencyObject
     {
         #region Properties
 

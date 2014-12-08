@@ -355,6 +355,23 @@ namespace Fluent
                         parentSelector.SelectedItem = item;
                     }
                 }
+                else
+                {
+                    DependencyObject parent = ((GalleryItem)d).TemplatedParent;
+                    while (parent != null && !(parent is Selector))
+                    {
+                        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+                    }
+                    parentSelector = parent as Selector;
+                    if (parentSelector != null)
+                    {
+                        var item = ((GalleryItem)d).DataContext;
+                        if (ReferenceEquals(parentSelector.SelectedItem, item) == false)
+                        {
+                            parentSelector.SelectedItem = item;
+                        }
+                    }
+                }
             }
         }
 

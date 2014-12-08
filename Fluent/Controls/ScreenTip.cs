@@ -323,8 +323,8 @@ namespace Fluent
         /// Using a DependencyProperty as the backing store for BelowRibbon.  
         /// This enables animation, styling, binding, etc...
         /// </summary> 
-        public static readonly DependencyProperty IsRibbonAlignedProperty = 
-            DependencyProperty.Register("BelowRibbon", typeof(bool), typeof(ScreenTip), 
+        public static readonly DependencyProperty IsRibbonAlignedProperty =
+            DependencyProperty.Register("IsRibbonAligned", typeof(bool), typeof(ScreenTip), 
             new UIPropertyMetadata(true));
         
 

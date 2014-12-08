@@ -1,6 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Fluent
@@ -88,6 +90,32 @@ namespace Fluent
         {
             get { return rows; }
         }
+
+        #region RowsSource
+
+        /// <summary>
+        /// Gets or sets RowsSource
+        /// </summary>
+        public IEnumerable RowsSource
+        {
+            get { return (IEnumerable)GetValue(RowsSourceProperty); }
+            set { SetValue(RowsSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for RowsSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty RowsSourceProperty =
+            DependencyProperty.Register("RowsSource", typeof(IEnumerable), typeof(RibbonToolBarLayoutDefinition), new UIPropertyMetadata(null, OnRowsSourceChanged));
+
+        static void OnRowsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonToolBarLayoutDefinition layoutDefinition = (RibbonToolBarLayoutDefinition)d;
+            ItemsSourceHelper.ItemsSourceChanged<RibbonToolBarRow>(layoutDefinition, layoutDefinition.Rows, e, null, new Converters.RibbonToolBarRowConverter());
+        }
+
+        #endregion
 
         #endregion
     }

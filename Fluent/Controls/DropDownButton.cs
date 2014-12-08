@@ -495,8 +495,6 @@ namespace Fluent
                     {
                         return dataTemplateContent as DependencyObject;
                     }
-
-                    throw new InvalidOperationException("Invalid ItemContainer");
                 }
             }
 #endif
@@ -519,7 +517,7 @@ namespace Fluent
             }
 #endif
 
-            return isItemItsOwnContainerOverride;
+            return item is FrameworkElement;
         }
 
         private void OnDropDownPopupKeyDown(object sender, KeyEventArgs e)

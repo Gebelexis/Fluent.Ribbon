@@ -140,7 +140,12 @@
         {
             while (!(o is RibbonGroupBox))
             {
-                o = VisualTreeHelper.GetParent(o) ?? LogicalTreeHelper.GetParent(o);
+                if (o is RibbonToolBarControlDefinition)
+                {
+                    o = LogicalTreeHelper.GetParent(o);
+                }
+                else
+                    o = VisualTreeHelper.GetParent(o) ?? LogicalTreeHelper.GetParent(o);
                 if (o == null)
                 {
                     break;

@@ -2192,8 +2192,7 @@ namespace Fluent
         static void OnTabItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<RibbonTabItem>(ribbon, ribbon.Tabs, ribbon.TabItemsTemplate, e,
-                (sender, args) => { Ribbon r = sender as Ribbon; r.SelectedTabIndex = ItemsSourceHelper.SelectorItemsSource_CollectionChanged(r, r.Tabs, r.TabItemsTemplate, r, args, r.SelectedTabIndex); });
+            ItemsSourceHelper.ItemsSourceChanged<RibbonTabItem>(ribbon, ribbon.Tabs, e, ribbon.TabItemsTemplate, null, () => ribbon.SelectedTabIndex, index => ribbon.SelectedTabIndex = index);
         }
 
         #endregion
@@ -2241,7 +2240,7 @@ namespace Fluent
         static void OnContextualTabGroupsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<RibbonContextualTabGroup>(ribbon, ribbon.ContextualGroups, ribbon.ContextualTabGroupsTemplate, e);
+            ItemsSourceHelper.ItemsSourceChanged<RibbonContextualTabGroup>(ribbon, ribbon.ContextualGroups, e, ribbon.ContextualTabGroupsTemplate);
         }
 
         #endregion
@@ -2267,7 +2266,7 @@ namespace Fluent
         static void OnToolbarItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<UIElement>(ribbon, ribbon.ToolBarItems, null, e);
+            ItemsSourceHelper.ItemsSourceChanged<UIElement>(ribbon, ribbon.ToolBarItems, e);
         }
 
         #endregion
@@ -2313,10 +2312,10 @@ namespace Fluent
         static void OnQuickAccessItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Ribbon ribbon = (Ribbon)d;
-            ItemsSourceHelper.ItemsSourceChanged<QuickAccessMenuItem>(ribbon, ribbon.QuickAccessItems, ribbon.QuickAccessItemsTemplate, e, null,
-                new Action<FrameworkElement, QuickAccessMenuItem, object>((fElement, dObject, item) =>
+            ItemsSourceHelper.ItemsSourceChanged<QuickAccessMenuItem>(ribbon, ribbon.QuickAccessItems, e, ribbon.QuickAccessItemsTemplate, null, null, null,
+                new Action<DependencyObject, QuickAccessMenuItem, object>((fElement, dObject, item) =>
                 {
-                    var contentTemplate = fElement.FindResource(new DataTemplateKey(item.GetType()));
+                    var contentTemplate = ((FrameworkElement)fElement).FindResource(new DataTemplateKey(item.GetType()));
                     if (contentTemplate != null && contentTemplate is DataTemplate)
                     {
                         FrameworkElement cObject = ((DataTemplate)contentTemplate).LoadContent() as FrameworkElement;

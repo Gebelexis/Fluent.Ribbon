@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Fluent
@@ -30,6 +32,32 @@ namespace Fluent
         public ObservableCollection<DependencyObject> Children
         {
             get { return children; }
+        }
+
+        #endregion
+
+        #region ChildrenSource
+
+        /// <summary>
+        /// Gets or sets ChildrenSource
+        /// </summary>
+        public IEnumerable ChildrenSource
+        {
+            get { return (IEnumerable)GetValue(ChildrenSourceProperty); }
+            set { SetValue(ChildrenSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for ChildrenSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty ChildrenSourceProperty =
+            DependencyProperty.Register("ChildrenSource", typeof(IEnumerable), typeof(RibbonToolBarRow), new UIPropertyMetadata(null, OnChildrenSourceChanged));
+
+        static void OnChildrenSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonToolBarRow toolBarRow = (RibbonToolBarRow)d;
+            ItemsSourceHelper.ItemsSourceChanged<DependencyObject>(toolBarRow, toolBarRow.Children, e, null, new Converters.RibbonToolBarControlRowChildDefinitionConverter());
         }
 
         #endregion

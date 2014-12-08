@@ -27,6 +27,7 @@ namespace Fluent
     using System.Windows.Threading;
     using Fluent.Extensibility;
     using System.Collections;
+    using Fluent.Internal;
 
     /// <summary>
     /// Represents the In-Ribbon Gallery, a gallery-based control that exposes 
@@ -75,6 +76,7 @@ namespace Fluent
 
         private bool isButtonClicked;
 
+        private ItemContainerGeneratorAction initializeSelectedFilter;
         #endregion
 
         #region Properties
@@ -393,8 +395,27 @@ namespace Fluent
         static object CoerceSelectedFilter(DependencyObject d, object basevalue)
         {
             InRibbonGallery gallery = (InRibbonGallery)d;
-            if ((basevalue == null) && (gallery.Filters.Count > 0)) return gallery.Filters[0];
+            if ((basevalue == null) && (gallery.Filters.Count > 0))
+            {
+                if (gallery.SelectedFilterIndex == -1) //postpone selecting the filter, wait a bit for a SelectedFilterIndex 
+                    gallery.initializeSelectedFilter.QueueAction();
+                else
+                {
+                    if (gallery.SelectedFilterIndex >= 0 && gallery.SelectedFilterIndex < gallery.Filters.Count)
+                        return gallery.Filters[gallery.SelectedFilterIndex];
+                    else
+                        return gallery.Filters[0];
+                }
+            }
             return basevalue;
+        }
+
+        private void InitializeFilter()
+        {
+            if (SelectedFilterIndex >= 0 && SelectedFilterIndex < Filters.Count)
+                SelectedFilter = Filters[SelectedFilterIndex];
+            else
+                SelectedFilter = Filters[0];
         }
 
         // Handles filter property changed
@@ -412,7 +433,10 @@ namespace Fluent
             {
                 gallery.SelectedFilterTitle = filter.Title;
                 gallery.SelectedFilterGroups = filter.Groups;
-                gallery.SelectedFilterIndex = gallery.Filters.IndexOf(filter);
+                if (gallery.SelectedFilterIndex != gallery.Filters.IndexOf(filter))
+                {
+                    gallery.SelectedFilterIndex = gallery.Filters.IndexOf(filter);
+                }
                 System.Windows.Controls.MenuItem menuItem = gallery.GetFilterMenuItem(filter);
                 if (menuItem != null) menuItem.IsChecked = true;
             }
@@ -420,7 +444,10 @@ namespace Fluent
             {
                 gallery.SelectedFilterTitle = "";
                 gallery.SelectedFilterGroups = null;
-                gallery.SelectedFilterIndex = -1;
+                if (gallery.SelectedFilterIndex != -1)
+                {
+                    gallery.SelectedFilterIndex = -1;
+                }
             }
             gallery.UpdateLayout();
         }
@@ -915,6 +942,7 @@ namespace Fluent
         public InRibbonGallery()
         {
             ContextMenuService.Coerce(this);
+            this.initializeSelectedFilter = new ItemContainerGeneratorAction(this.ItemContainerGenerator, this.InitializeFilter);
         }
 
         #endregion
@@ -946,13 +974,13 @@ namespace Fluent
             foreach (var item in e.RemovedItems)
             {
                 GalleryItem itemContainer = (ItemContainerGenerator.ContainerFromItem(item) as GalleryItem);
-                if (itemContainer != null) itemContainer.IsSelected = false;
+                if (itemContainer != null && itemContainer.IsSelected) itemContainer.IsSelected = false;
             }
 
             foreach (var item in e.AddedItems)
             {
                 GalleryItem itemContainer = (ItemContainerGenerator.ContainerFromItem(item) as GalleryItem);
-                if (itemContainer != null) itemContainer.IsSelected = true;
+                if (itemContainer != null && !itemContainer.IsSelected) itemContainer.IsSelected = true;
             }
             //if (IsDropDownOpen) IsDropDownOpen = false;
             base.OnSelectionChanged(e);
@@ -1215,12 +1243,32 @@ namespace Fluent
             }
         }
 
+#if NET45
+        private object currentItem;
+#endif
         /// <summary>
         /// Creates or identifies the element that is used to display the given item.
         /// </summary>
         /// <returns>The element that is used to display the given item.</returns>
         protected override DependencyObject GetContainerForItemOverride()
         {
+#if NET45
+            var item = this.currentItem;
+            this.currentItem = null;
+
+            if (item != null)
+            {
+                var dataTemplate = this.ItemTemplate;
+                if (dataTemplate != null)
+                {
+                    var dataTemplateContent = (object)dataTemplate.LoadContent();
+                    if (dataTemplateContent is GalleryItem)
+                    {
+                        return dataTemplateContent as DependencyObject;
+                    }
+                }
+            }
+#endif
             return new GalleryItem();
         }
 
@@ -1231,7 +1279,16 @@ namespace Fluent
         /// <returns></returns>
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return item is GalleryItem;
+            var isItemItsOwnContainerOverride = item is GalleryItem;
+
+#if NET45
+            if (isItemItsOwnContainerOverride == false)
+            {
+                this.currentItem = item;
+            }
+#endif
+
+            return isItemItsOwnContainerOverride;
         }
 
         /// <summary>
@@ -1520,26 +1577,6 @@ namespace Fluent
 
         #endregion
 
-        #region GalleryGroupFilterTemplate
-
-        /// <summary>
-        /// Gets or sets GalleryGroupFilterTemplate
-        /// </summary>
-        public DataTemplate GalleryGroupFilterTemplate
-        {
-            get { return (DataTemplate)GetValue(GalleryGroupFilterTemplateProperty); }
-            set { SetValue(GalleryGroupFilterTemplateProperty, value); }
-        }
-
-        /// <summary>
-        /// Using a DependencyProperty as the backing store for GalleryGroupFilterTemplate. 
-        /// This enables animation, styling, binding, etc...
-        /// </summary>
-        public static readonly DependencyProperty GalleryGroupFilterTemplateProperty =
-            DependencyProperty.Register("GalleryGroupFilterTemplate", typeof(DataTemplate), typeof(InRibbonGallery), new UIPropertyMetadata(null));
-
-        #endregion
-
         #region GalleryGroupFilterSource
 
         /// <summary>
@@ -1561,8 +1598,7 @@ namespace Fluent
         static void OnGalleryGroupFilterSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             InRibbonGallery gallery = (InRibbonGallery)d;
-            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, gallery.GalleryGroupFilterTemplate, e,
-                (sender, args) => { InRibbonGallery g = sender as InRibbonGallery; g.SelectedFilterIndex = ItemsSourceHelper.SelectorItemsSource_CollectionChanged(g, g.Filters, g.GalleryGroupFilterTemplate, g, args, g.SelectedFilterIndex); });
+            ItemsSourceHelper.ItemsSourceChanged<GalleryGroupFilter>(gallery, gallery.Filters, e, null, new Converters.GalleryGroupFilterConverter(), () => gallery.SelectedFilterIndex, index => gallery.SelectedFilterIndex = index);
         }
 
         #endregion
@@ -1593,11 +1629,15 @@ namespace Fluent
             if (selectedIndex >= 0
                 && selectedIndex < gallery.Filters.Count)
             {
-                gallery.SelectedFilter = gallery.Filters[selectedIndex];
+                if (ReferenceEquals(gallery.SelectedFilter, gallery.Filters[selectedIndex]) == false)
+                {
+                    gallery.SelectedFilter = gallery.Filters[selectedIndex];
+                }
             }
             else
             {
-                gallery.SelectedFilter = null;
+                if (gallery.SelectedFilter != null)
+                    gallery.SelectedFilter = null;
             }
         }
 

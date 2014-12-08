@@ -61,8 +61,7 @@ namespace Fluent
                 if (dataTemplate != null)
                 {
                     var dataTemplateContent = (object)dataTemplate.LoadContent();
-                    if (dataTemplateContent is System.Windows.Controls.MenuItem
-                        || dataTemplateContent is MenuItem || dataTemplateContent is Separator || dataTemplateContent is Gallery)
+                    if (dataTemplateContent is System.Windows.Controls.MenuItem || dataTemplateContent is Separator || dataTemplateContent is Gallery)
                     {
                         return dataTemplateContent as DependencyObject;
                     }
@@ -91,7 +90,7 @@ namespace Fluent
                 this.currentItem = null;
 #endif
 
-            return isItemItsOwnContainerOverride;
+            return item is FrameworkElement;
         }
 
         /// <summary>

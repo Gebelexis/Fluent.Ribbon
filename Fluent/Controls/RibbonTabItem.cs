@@ -820,7 +820,7 @@ namespace Fluent
         static void OnGroupsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             RibbonTabItem ribbonTabItem = (RibbonTabItem)d;
-            ItemsSourceHelper.ItemsSourceChanged<RibbonGroupBox>(ribbonTabItem, ribbonTabItem.Groups, ribbonTabItem.GroupsTemplate, e);
+            ItemsSourceHelper.ItemsSourceChanged<RibbonGroupBox>(ribbonTabItem, ribbonTabItem.Groups, e, ribbonTabItem.GroupsTemplate);
         }
                 
         #endregion

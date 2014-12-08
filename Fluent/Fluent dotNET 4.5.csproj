@@ -86,6 +86,9 @@
     <Compile Include="Controls\ComboBox.cs" />
     <Compile Include="Controls\ContextMenu.cs" />
     <Compile Include="Converters\EmptyContentToVisibilty.cs" />
+    <Compile Include="Converters\EnumToEnunConverter.cs" />
+    <Compile Include="Converters\GalleryGroupFilterConverter.cs" />
+    <Compile Include="Converters\RibbonToolBarConverters.cs" />
     <Compile Include="Helpers\ItemsSourceHelper.cs" />
     <Compile Include="Internal\UIHelper.cs" />
     <Compile Include="Services\ContextMenuService.cs" />

@@ -3,6 +3,7 @@
     using System;
     using System.ComponentModel;
     using System.Globalization;
+    using System.Windows.Data;
 
     /// <summary>
     /// Class which enables conversion from <see cref="string"/> to <see cref="RibbonControlSizeDefinition"/>
@@ -33,4 +34,20 @@
             return new RibbonControlSizeDefinition(value as string);
         }
     }
+
+    public class SizeDefinitionValueConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value == null)
+                throw new ArgumentException("Wrong value argument in SizeDefinitionValueConverter");
+            return new RibbonControlSizeDefinition(value.ToString());
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+        #endregion
+    }    
 }

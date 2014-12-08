@@ -152,7 +152,7 @@
                         )
                     )
                 {
-                    RaiseDismissPopupEvent(sender, DismissPopupMode.MouseNotOver);
+                    RaiseDismissPopupEvent(sender, DismissPopupMode.Always); //changed mouseNotOver to Always to have ApplicationMenu dismiss when clicking on the right of the menu button
                 }
             }
         }

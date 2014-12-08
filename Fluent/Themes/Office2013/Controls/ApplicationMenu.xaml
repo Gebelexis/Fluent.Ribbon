@@ -44,10 +44,7 @@
                       VerticalAlignment="Top">                  
                     <Border x:Name="PART_DropDownBorder"
                             MinWidth="{TemplateBinding ActualWidth}"
-                            SnapsToDevicePixels="True"
-                            Background="{DynamicResource ContextMenuBarBackgroundBrush}"
-                            BorderBrush="{DynamicResource ContextMenuBarBorderBrush}"
-                            BorderThickness="1"
+                            SnapsToDevicePixels="True"                           
                             d:LayoutOverrides="Width, Height"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top">
@@ -60,17 +57,15 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto"
-                                                   MinHeight="17" />
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"
                                                       MinWidth="100" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Border Grid.Row="0"
-                                        Grid.ColumnSpan="2"
-                                        BorderThickness="0,0,0,1"
+                                <Border Grid.Column="0" Width="Auto" HorizontalAlignment="Left"                                        
+                                        BorderThickness="1,1,0,0"
                                         BorderBrush="{DynamicResource ContextMenuSeparatorBrush}"
                                         Margin="0"
                                         Background="{DynamicResource RibbonBackgoundBrush}">
@@ -79,29 +74,39 @@
                                                     Margin="-1,-1,0,0" />
                                 </Border>
 
-                                <StackPanel Orientation="Vertical"
+                                <Border Grid.Row="1"
+                                        Grid.Column="0"
+                                        BorderThickness="0,1,1,1"
+                                        BorderBrush="{DynamicResource ContextMenuSeparatorBrush}"
+                                        Background="{DynamicResource ContextMenuBarBackgroundBrush}"
+                                        Margin="0">
+                                    <StackPanel Orientation="Vertical"
                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                                             Grid.Row="1"
                                             Grid.Column="0"
                                             x:Name="PART_MenuPanel"
                                             IsItemsHost="True"
                                             KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                </Border>
+                                
+                                
                                 <Border Grid.Row="1"
                                         Grid.Column="1"
-                                        BorderThickness="1,0,0,0"
+                                        BorderThickness="0,1,1,1"
                                         BorderBrush="{DynamicResource ContextMenuSeparatorBrush}"
                                         Width="{TemplateBinding RightPaneWidth}"
                                         Background="{DynamicResource GalleryBackgroundBrush}">
                                     <ContentPresenter ContentSource="RightPaneContent"
                                                       x:Name="PART_RightContentPresenter" />
                                 </Border>
-                                <Border Grid.Row="2"
+                                <Border Grid.Row="2" x:Name="borderFooterContentPresenter"
                                         Grid.ColumnSpan="2"
-                                        BorderThickness="0,1,0,0"
+                                        BorderThickness="1,0,1,1"
                                         BorderBrush="{DynamicResource ContextMenuSeparatorBrush}"
                                         Background="{DynamicResource RibbonBackgoundBrush}"
                                         Margin="0">
-                                    <ContentPresenter ContentSource="FooterPaneContent" />
+                                    <ContentPresenter ContentSource="FooterPaneContent"
+                                                      x:Name="PART_FooterContentPresenter" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -159,6 +164,12 @@
                                Value="True" />
                 </MultiTrigger.Conditions>
             </MultiTrigger>
+            <Trigger Property="ActualHeight" SourceName="PART_FooterContentPresenter"
+                     Value="0">
+                <Setter Property="BorderThickness"
+                        TargetName="borderFooterContentPresenter"
+                        Value="0,0,0,0" />
+            </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

@@ -33,7 +33,7 @@ Office2013\Controls\InRibbonGallery.xaml
 Office2013\Controls\BackstageTabItem.xaml
 Office2013\Controls\BackstageControls.xaml
 Office2013\Controls\BackstageTabControl.xaml
-Office2010\Controls\RibbonSeparator.xaml
+Office2013\Controls\RibbonSeparator.xaml
 Office2010\Controls\RibbonToolBar.xaml
 Office2010\Controls\RibbonToolBarControlGroup.xaml
 Office2013\Controls\StatusBar.xaml

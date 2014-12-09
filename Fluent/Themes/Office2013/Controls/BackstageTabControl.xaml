@@ -163,40 +163,40 @@
                 <Storyboard x:Key="OnIsOpenTrueStoryboard">
                     <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
                                                       Storyboard.TargetName="grid">
-                        <Fluent:EasingThicknessKeyFrame KeyTime="0"
+                        <EasingThicknessKeyFrame KeyTime="0"
                                                         Value="-30,0,0,0" />
-                        <Fluent:EasingThicknessKeyFrame KeyTime="0:0:0.2"
+                        <EasingThicknessKeyFrame KeyTime="0:0:0.2"
                                                         Value="0">
-                            <Fluent:EasingThicknessKeyFrame.EasingFunction>
-                                <Fluent:CubicEase EasingMode="EaseInOut" />
-                            </Fluent:EasingThicknessKeyFrame.EasingFunction>
-                        </Fluent:EasingThicknessKeyFrame>
+                            <EasingThicknessKeyFrame.EasingFunction>
+                                <CubicEase EasingMode="EaseInOut" />
+                            </EasingThicknessKeyFrame.EasingFunction>
+                        </EasingThicknessKeyFrame>
                     </ThicknessAnimationUsingKeyFrames>
                     <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
                                                    Storyboard.TargetName="grid">
-                        <Fluent:EasingDoubleKeyFrame KeyTime="0"
+                        <EasingDoubleKeyFrame KeyTime="0"
                                                      Value="0" />
-                        <Fluent:EasingDoubleKeyFrame KeyTime="0:0:0.2"
+                        <EasingDoubleKeyFrame KeyTime="0:0:0.2"
                                                      Value="1" />
                     </DoubleAnimationUsingKeyFrames>
                 </Storyboard>
                 <Storyboard x:Key="OnIsOpenFalseStoryboard">
                     <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)"
                                                       Storyboard.TargetName="grid">
-                        <Fluent:EasingThicknessKeyFrame KeyTime="0"
+                        <EasingThicknessKeyFrame KeyTime="0"
                                                         Value="0" />
-                        <Fluent:EasingThicknessKeyFrame KeyTime="0:0:0.2"
+                        <EasingThicknessKeyFrame KeyTime="0:0:0.2"
                                                         Value="-30,0,0,0">
-                            <Fluent:EasingThicknessKeyFrame.EasingFunction>
-                                <Fluent:CubicEase EasingMode="EaseInOut" />
-                            </Fluent:EasingThicknessKeyFrame.EasingFunction>
-                        </Fluent:EasingThicknessKeyFrame>
+                            <EasingThicknessKeyFrame.EasingFunction>
+                                <CubicEase EasingMode="EaseInOut" />
+                            </EasingThicknessKeyFrame.EasingFunction>
+                        </EasingThicknessKeyFrame>
                     </ThicknessAnimationUsingKeyFrames>
                     <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
                                                    Storyboard.TargetName="grid">
-                        <Fluent:EasingDoubleKeyFrame KeyTime="0"
+                        <EasingDoubleKeyFrame KeyTime="0"
                                                      Value="1" />
-                        <Fluent:EasingDoubleKeyFrame KeyTime="0:0:0.2"
+                        <EasingDoubleKeyFrame KeyTime="0:0:0.2"
                                                      Value="0" />
                     </DoubleAnimationUsingKeyFrames>
                 </Storyboard>                

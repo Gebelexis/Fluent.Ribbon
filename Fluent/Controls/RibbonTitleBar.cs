@@ -195,7 +195,10 @@ namespace Fluent
             this.headerHolder.Measure(this.headerRect.Size);
             this.quickAccessToolbarHolder.Measure(this.quickAccessToolbarRect.Size);
 
-            return resultSize;
+            var maxHeight = Math.Max(Math.Max(this.itemsRect.Height, this.headerRect.Height), this.quickAccessToolbarRect.Height);
+            var width = this.itemsRect.Width + this.headerRect.Width + this.quickAccessToolbarRect.Width;
+
+            return new Size(width, maxHeight);
         }
 
         /// <summary>

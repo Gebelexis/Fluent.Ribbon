@@ -417,9 +417,10 @@ namespace Fluent
             sizeBinding.Converter = new Fluent.Converters.EnumToEnumConverter();
             BindingOperations.SetBinding(child, RibbonToolBarControlDefinition.SizeProperty, sizeBinding);
 
-            Binding sizeDefinitionBinding = new Binding("SizeDefinition");
-            sizeDefinitionBinding.Source = controlDefinition;
-            BindingOperations.SetBinding(child, RibbonToolBarControlDefinition.SizeDefinitionProperty, sizeDefinitionBinding);
+            //do not uncomment. still inverstigating toolbar initial zise bug
+            //Binding sizeDefinitionBinding = new Binding("SizeDefinition");
+            //sizeDefinitionBinding.Source = controlDefinition;
+            //BindingOperations.SetBinding(child, RibbonToolBarControlDefinition.SizeDefinitionProperty, sizeDefinitionBinding);
 
             return child;
         }

@@ -125,10 +125,15 @@ namespace Fluent
             var item = this.currentItem;
             this.currentItem = null;
 
-            if (this.UsesItemContainerTemplate
-                && item != null)
+            if (item != null 
+                && ((this.UsesItemContainerTemplate && this.ItemContainerTemplateSelector != null) || this.ItemTemplateSelector != null))
             {
-                var dataTemplate = this.ItemContainerTemplateSelector.SelectTemplate(item, this);
+                DataTemplate dataTemplate = null;
+                if (this.ItemTemplateSelector != null)
+                    dataTemplate = this.ItemTemplateSelector.SelectTemplate(item, this);
+                else if (this.ItemContainerTemplateSelector != null)
+                    dataTemplate = this.ItemContainerTemplateSelector.SelectTemplate(item, this);
+
                 if (dataTemplate != null)
                 {
                     var dataTemplateContent = (object)dataTemplate.LoadContent();

@@ -183,7 +183,7 @@
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
-                    <Condition Property="IsHighlighted"
+                    <Condition Property="IsMouseOver"
                                Value="True" />
                     <Condition Property="IsEnabled"
                                Value="True" />

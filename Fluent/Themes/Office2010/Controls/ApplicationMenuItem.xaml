@@ -50,7 +50,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="border" Value="Visible"/>
@@ -194,7 +194,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="border" Value="Visible"/>
@@ -305,7 +305,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="PART_ButtonBorder" Value="Visible"/>
@@ -399,7 +399,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="border" Value="Visible"/>
@@ -544,7 +544,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="border" Value="Visible"/>
@@ -706,7 +706,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="IsHighlighted" Value="True"/>
+          <Condition Property="IsMouseOver" Value="True"/>
           <Condition Property="IsEnabled" Value="True"/>
         </MultiTrigger.Conditions>
         <Setter Property="Visibility" TargetName="PART_ButtonBorder" Value="Visible"/>

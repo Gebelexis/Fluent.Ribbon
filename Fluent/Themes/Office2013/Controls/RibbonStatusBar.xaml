@@ -23,29 +23,23 @@
                     <Border Height="Auto"
                             BorderThickness="0,1"
                             Background="{DynamicResource RibbonThemeColorBrush}">
-                        <ItemsPresenter x:Name="itemsPresenter" Height="Auto" />
+                        <Controls:StatusBarPanel IsItemsHost="True"
+                                             x:Name="PART_itemsPresenter"
+                                             Height="Auto"
+                                             Margin="0"
+                                             VerticalAlignment="Stretch" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsWindowMaximized"
                                  Value="False">
                             <Setter Property="Margin"
-                                    TargetName="itemsPresenter"
+                                    TargetName="PART_itemsPresenter"
                                     Value="0,0,16,0" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
-        </Setter>
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <ItemsPanelTemplate>
-                    <Controls:StatusBarPanel IsItemsHost="True"
-                                             Height="Auto"
-                                             Margin="0"
-                                             VerticalAlignment="Stretch" />
-                </ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
+        </Setter>        
     </Style>
 
     <Style x:Key="RibbonStatusBarItemStyle"

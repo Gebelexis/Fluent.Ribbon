@@ -257,12 +257,37 @@ namespace Fluent
             base.ItemContainerGenerator.StatusChanged += OnGeneratorStatusChanged;
         }
 
+#if NET45
+        private object currentItem;
+#endif
         /// <summary>
         /// Creates or identifies the element that is used to display the given item.
         /// </summary>
         /// <returns>The element that is used to display the given item.</returns>
         protected override DependencyObject GetContainerForItemOverride()
         {
+#if NET45
+            var item = this.currentItem;
+            this.currentItem = null;
+
+            if (item != null)
+            {
+                var dataTemplate = this.ItemTemplate;
+                if (dataTemplate == null && this.ItemTemplateSelector != null)
+                    dataTemplate = this.ItemTemplateSelector.SelectTemplate(item, this);
+                if (dataTemplate != null)
+                {
+                    var dataTemplateContent = (object)dataTemplate.LoadContent();
+                    if (dataTemplateContent is BackstageTabItem
+                        || dataTemplateContent is Button
+                        || dataTemplateContent is SeparatorTabItem
+                        || dataTemplateContent is Separator)
+                    {
+                        return dataTemplateContent as DependencyObject;
+                    }
+                }
+            }
+#endif
             return new BackstageTabItem();
         }
 
@@ -273,10 +298,19 @@ namespace Fluent
         /// <returns></returns>
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return item is BackstageTabItem
+            var isItemItsOwnContainerOverride = item is BackstageTabItem
                 || item is Button
                 || item is SeparatorTabItem
                 || item is Separator;
+
+#if NET45
+            if (isItemItsOwnContainerOverride == false)
+            {
+                this.currentItem = item;
+            }
+#endif
+
+            return isItemItsOwnContainerOverride;
         }
 
         /// <summary>
@@ -345,7 +379,13 @@ namespace Fluent
             if (item == null)
             {
                 item = FindNextTabItem(base.SelectedIndex, 1);
-                base.SelectedItem = item;
+                if (item is BackstageTabItem)
+                {
+                    if (!(selectedItem is FrameworkElement))
+                        base.SelectedItem = item.DataContext;
+                    else
+                        base.SelectedItem = item;
+                }
             }
             return item;
         }

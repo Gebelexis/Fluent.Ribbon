@@ -16,12 +16,12 @@
         <ControlTemplate TargetType="{x:Type Controls:StatusBar}">
           <Border BorderThickness="0,1" BorderBrush="{DynamicResource StatusBarBorderBrushBrush}">
             <Border Height="Auto" BorderThickness="0,1" BorderBrush="{DynamicResource StatusBarInnerBorderBrush}" Background="{DynamicResource StatusBarInnerBackgroundBrush}">
-              <Controls:StatusBarPanel IsItemsHost="True" x:Name="itemsPresenter" Height="Auto" Margin="0"/>
+              <Controls:StatusBarPanel IsItemsHost="True" x:Name="PART_itemsPresenter" Height="Auto" Margin="0"/>
             </Border>
           </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsWindowMaximized" Value="False">
-                    <Setter Property="Margin" TargetName="itemsPresenter" Value="0,0,16,0"/>
+                    <Setter Property="Margin" TargetName="PART_itemsPresenter" Value="0,0,16,0"/>
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>

@@ -20,6 +20,8 @@ namespace Fluent
 
         private Window ownerWindow;
 
+        private StatusBarPanel panel;
+
         #endregion
 
         #region Properties
@@ -97,6 +99,8 @@ namespace Fluent
                     IsWindowMaximized = false;
                 }
             }
+            this.panel.InvalidateArrange();
+            this.panel.InvalidateMeasure();
         }
 
         private void OnWindowStateChanged(object sender, EventArgs e)
@@ -114,6 +118,12 @@ namespace Fluent
         #endregion
 
         #region Overrides
+
+        public override void OnApplyTemplate()
+        {
+            this.panel = this.Template.FindName("PART_itemsPresenter", this) as StatusBarPanel;
+            base.OnApplyTemplate();
+        }
 
         /// <summary>
         /// Creates or identifies the element that is used to display the given item.

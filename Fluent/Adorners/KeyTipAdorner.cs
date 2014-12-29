@@ -21,6 +21,7 @@ using System.Windows.Threading;
 namespace Fluent
 {
     using System.Diagnostics;
+    using System.Windows.Controls;
 
     /// <summary>
     /// Represents adorner for KeyTips. 
@@ -614,11 +615,18 @@ namespace Fluent
                 {
                     control.OnKeyTipPressed();
                 }
+                else
+                {
+                    if (element is ComboBoxItem)
+                    {
+                        ((ComboBoxItem)element).IsSelected = true;
+                    }
+                }
             }
 
             var children = LogicalTreeHelper.GetChildren(element)
-                .OfType<UIElement>()
-                .ToArray();
+                 .OfType<UIElement>()
+                 .ToArray();
 
             if (children.Length == 0)
             {

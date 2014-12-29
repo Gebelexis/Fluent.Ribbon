@@ -18,6 +18,8 @@ using System.Windows.Media;
 namespace Fluent
 {
     using Fluent.Internal;
+    using System.Collections;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Represent panel with ribbon group.
@@ -104,7 +106,7 @@ namespace Fluent
         {          
             var desiredSize = GetChildrenDesiredSizeIntermediate();
 
-            if (this.reduceOrder.Length == 0)
+            if (this.reduceOrder.Length == 0 && (this.ReduceOrderSource == null || this.ReduceOrderSource.Count == 0))
             {
                 this.VerifyScrollData(availableSize.Width, desiredSize.Width);
                 return desiredSize;
@@ -113,7 +115,16 @@ namespace Fluent
             // If we have more available space - try to expand groups
             while (desiredSize.Width <= availableSize.Width)
             {
-                var hasMoreVariants = this.reduceOrderIndex < this.reduceOrder.Length - 1;
+                var hasMoreVariants = false;
+                if (this.reduceOrder.Length != 0)
+                {
+                    hasMoreVariants = this.reduceOrderIndex < this.reduceOrder.Length - 1;
+                }
+                else if (this.ReduceOrderSource != null && this.ReduceOrderSource.Count > 0)
+                {
+                    hasMoreVariants = this.reduceOrderIndex < this.ReduceOrderSource.Count - 1;
+                }
+
                 if (!hasMoreVariants)
                 {
                     break;
@@ -121,8 +132,14 @@ namespace Fluent
 
                 // Increase size of another item
                 this.reduceOrderIndex++;
-                this.IncreaseGroupBoxSize(this.reduceOrder[this.reduceOrderIndex]);
-
+                if (this.reduceOrder.Length != 0)
+                {
+                    this.IncreaseGroupBoxSize(this.reduceOrder[this.reduceOrderIndex]);
+                }
+                else if (this.ReduceOrderSource.Count > 0)
+                {
+                    this.IncreaseGroupBoxSize(this.ReduceOrderSource[this.reduceOrderIndex]);
+                }
                 desiredSize = this.GetChildrenDesiredSizeIntermediate();
             }
 
@@ -136,7 +153,14 @@ namespace Fluent
                 }
 
                 // Decrease size of another item
-                this.DecreaseGroupBoxSize(this.reduceOrder[this.reduceOrderIndex]);
+                if (this.reduceOrder.Length != 0)
+                {
+                    this.DecreaseGroupBoxSize(this.reduceOrder[this.reduceOrderIndex]);
+                }
+                else if (this.ReduceOrderSource.Count > 0)
+                {
+                    this.DecreaseGroupBoxSize(this.ReduceOrderSource[this.reduceOrderIndex]);
+                }
                 this.reduceOrderIndex--;
 
                 desiredSize = this.GetChildrenDesiredSizeIntermediate();
@@ -218,6 +242,27 @@ namespace Fluent
             }
         }
 
+        private void IncreaseGroupBoxSize(Tuple<object, bool> item)
+        {
+            var groupBox = this.FindGroupByDataContext(item.Item1);
+            var scale = item.Item2;
+            if (groupBox == null)
+            {
+                return;
+            }
+
+            if (scale)
+            {
+                groupBox.ScaleIntermediate++;
+            }
+            else
+            {
+                groupBox.StateIntermediate = groupBox.StateIntermediate != RibbonGroupBoxState.Large
+                    ? groupBox.StateIntermediate - 1
+                    : RibbonGroupBoxState.Large;
+            }
+        }
+
         // Decrease size of the item
         private void DecreaseGroupBoxSize(string name)
         {
@@ -240,6 +285,28 @@ namespace Fluent
             }
         }
 
+        // Decrease size of the item
+        private void DecreaseGroupBoxSize(Tuple<object, bool> item)
+        {
+            var groupBox = FindGroupByDataContext(item.Item1);
+            var scale = item.Item2;
+            if (groupBox == null)
+            {
+                return;
+            }
+
+            if (scale)
+            {
+                groupBox.ScaleIntermediate--;
+            }
+            else
+            {
+                groupBox.StateIntermediate = groupBox.StateIntermediate != RibbonGroupBoxState.Collapsed
+                    ? groupBox.StateIntermediate + 1
+                    : groupBox.StateIntermediate;
+            }
+        }
+
         private RibbonGroupBox FindGroup(string name)
         {
             if (name.StartsWith("(", StringComparison.OrdinalIgnoreCase))
@@ -250,6 +317,18 @@ namespace Fluent
             foreach (FrameworkElement child in this.InternalChildren)
             {
                 if (child.Name == name)
+                {
+                    return child as RibbonGroupBox;
+                }
+            }
+            return null;
+        }
+
+        private RibbonGroupBox FindGroupByDataContext(object dataContext)
+        {
+            foreach (FrameworkElement child in this.InternalChildren)
+            {
+                if (child is RibbonGroupBox && child.DataContext == dataContext)
                 {
                     return child as RibbonGroupBox;
                 }
@@ -605,6 +684,41 @@ namespace Fluent
             return offset;
         }
 
+        #endregion
+
+        #region ReduceOrderSource
+        /// <summary>
+        /// Gets or sets reduce order source of group in the ribbon panel.
+        /// It must be enumerated with comma from the first to reduce to 
+        /// the last to reduce (use Control.Name as group name in the enum). 
+        /// Enclose in parentheses as (Control.Name) to reduce/enlarge 
+        /// scalable elements in the given group
+        /// </summary>
+        public List<Tuple<object, bool>> ReduceOrderSource
+        {
+            get { return (List<Tuple<object, bool>>)GetValue(ReduceOrderSourceProperty); }
+            set { SetValue(ReduceOrderSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for ReduceOrderSource.  
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty ReduceOrderSourceProperty =
+            DependencyProperty.Register("ReduceOrderSource", typeof(List<Tuple<object, bool>>), typeof(RibbonGroupsContainer), new UIPropertyMetadata(ReduceOrderSourcePropertyChanged));
+
+        // handles ReduseOrder property changed
+        static void ReduceOrderSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonGroupsContainer ribbonPanel = (RibbonGroupsContainer)d;
+
+            ribbonPanel.ReduceOrderSource = (List<Tuple<object, bool>>)e.NewValue;
+            ribbonPanel.reduceOrderIndex = ribbonPanel.ReduceOrderSource == null || ribbonPanel.ReduceOrderSource.Count == 0 
+                ? 0 : ribbonPanel.ReduceOrderSource.Count - 1;
+
+            ribbonPanel.InvalidateMeasure();
+            ribbonPanel.InvalidateArrange();
+        }
         #endregion
     }
 }

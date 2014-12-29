@@ -39,11 +39,18 @@ namespace Fluent
         protected override IEnumerator LogicalChildren
         {
             get
-            {
-                ArrayList list = new ArrayList();
-                if (Items != null) list.AddRange(Items);
-                if (button != null) list.Add(button);
-                return list.GetEnumerator();
+            {               
+                foreach (var item in this.Items)
+                {
+                    var child = item as UIElement;
+                    if (child == null)
+                        child = (UIElement)this.ItemContainerGenerator.ContainerFromItem(item);
+                    if (child is System.Windows.Controls.ContentPresenter)
+                        child = (UIElement)System.Windows.Media.VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                    yield return child;
+                }
+                if (button != null) 
+                    yield return button;
             }
         }
 

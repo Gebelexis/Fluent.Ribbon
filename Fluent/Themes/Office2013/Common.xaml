@@ -34,6 +34,9 @@
     <Style x:Key="{x:Type Fluent:Button}"
            TargetType="{x:Type Fluent:Button}"
            BasedOn="{StaticResource RibbonButtonStyle}" />
+    <Style x:Key="{x:Type Fluent:RibbonContentControl}"
+           TargetType="{x:Type Fluent:RibbonContentControl}"
+           BasedOn="{StaticResource RibbonContentControlStyle}" />
     <Style x:Key="{x:Type Fluent:DropDownButton}"
            TargetType="{x:Type Fluent:DropDownButton}"
            BasedOn="{StaticResource RibbonDropDownButtonStyle}" />

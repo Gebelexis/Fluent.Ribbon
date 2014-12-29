@@ -15,9 +15,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace Fluent
 {
@@ -642,5 +644,23 @@ namespace Fluent
         }
 
         #endregion
+
+        protected override IEnumerator LogicalChildren
+        {
+            get
+            {
+                foreach (var item in this.Items)
+                {
+                    var child = item as UIElement;
+                    if (child == null)
+                        child = (UIElement)this.ItemContainerGenerator.ContainerFromItem(item);
+                    if (child is System.Windows.Controls.ContentPresenter)
+                        child = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                    yield return child;
+                }
+                //if (this.groupsMenuButton != null)
+                //    yield return this.groupsMenuButton;
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-#region Copyright and License Information
+﻿#region Copyright and License Information
 // Fluent Ribbon Control Suite
 // http://fluent.codeplex.com/
 // Copyright � Degtyarev Daniel, Rikker Serg. 2009-2010.  All rights reserved.
@@ -955,7 +955,12 @@ namespace Fluent
 
                 foreach (var item in this.Items)
                 {
-                    yield return item;
+                    var child = item as UIElement;
+                    if (child == null)
+                        child = (UIElement)this.ItemContainerGenerator.ContainerFromItem(item);
+                    if (child is System.Windows.Controls.ContentPresenter)
+                        child = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                    yield return child;
                 }
             }
         }

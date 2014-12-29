@@ -22,6 +22,7 @@ using System.Windows.Media;
 
 namespace Fluent
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Data;
 
@@ -821,8 +822,48 @@ namespace Fluent
         {
             RibbonTabItem ribbonTabItem = (RibbonTabItem)d;
             ItemsSourceHelper.ItemsSourceChanged<RibbonGroupBox>(ribbonTabItem, ribbonTabItem.Groups, e, ribbonTabItem.GroupsTemplate);
+            //make sure that there are not items in ReduceOrderSource that are not DataContext for a RibbonGroupBox
+            //ex: if we remove a groupbox we should update the reduce order source so it no longer has references to this groupbox
+            if (ribbonTabItem.ReduceOrderSource == null || ribbonTabItem.ReduceOrderSource.Count == 0)
+                return;
+            List<object> groupBoxItems = ribbonTabItem.Groups.Select(g => g.DataContext).ToList();
+            var reduceOrderSource = new List<Tuple<object, bool>>();
+            for (int i = 0; i < ribbonTabItem.ReduceOrderSource.Count; i++)
+            {
+                if (groupBoxItems.Contains(ribbonTabItem.ReduceOrderSource[i].Item1))
+                {
+                    reduceOrderSource.Add(ribbonTabItem.ReduceOrderSource[i]);
+                }
+            }
+            ribbonTabItem.ReduceOrderSource = reduceOrderSource;
         }
                 
+        #endregion
+
+        #region ReduceOrderSource
+
+        /// <summary>
+        /// Gets or sets ReduceOrderSource
+        /// </summary>
+        public List<Tuple<object, bool>> ReduceOrderSource
+        {
+            get { return groupsInnerContainer.ReduceOrderSource; }
+            set { groupsInnerContainer.ReduceOrderSource = value; }
+        }
+
+        /// <summary>
+        /// Using a DependencyProperty as the backing store for ReduceOrderSource. 
+        /// This enables animation, styling, binding, etc...
+        /// </summary>
+        public static readonly DependencyProperty ReduceOrderSourceProperty =
+            DependencyProperty.Register("ReduceOrderSource", typeof(List<Tuple<object, bool>>), typeof(RibbonTabItem), new UIPropertyMetadata(null, OnReduceOrderSourceChanged));
+
+        static void OnReduceOrderSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RibbonTabItem ribbonTabItem = (RibbonTabItem)d;
+            ribbonTabItem.ReduceOrderSource = (List<Tuple<object, bool>>)e.NewValue;
+        }
+
         #endregion
 
         #endregion

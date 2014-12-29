@@ -22,6 +22,7 @@ using System.Windows.Threading;
 
 namespace Fluent
 {
+    using System.Collections;
     using System.Diagnostics;
 
     /// <summary>
@@ -1078,5 +1079,34 @@ namespace Fluent
         }
 
         #endregion
+
+        protected override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (this.Menu != null)
+                {
+                    foreach (var item in this.Menu.Items)
+                    {
+                        var child = item as UIElement;
+                        if (child == null)
+                            child = (UIElement)this.Menu.ItemContainerGenerator.ContainerFromItem(item);
+                        if (child is System.Windows.Controls.ContentPresenter)
+                            child = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                        yield return child;
+                    }
+                }
+                foreach (var item in this.Items)
+                {
+                    var child = item as UIElement;
+                    if (child == null)
+                        child = (UIElement)this.ItemContainerGenerator.ContainerFromItem(item);
+                    if (child is System.Windows.Controls.ContentPresenter)
+                        child = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                    yield return child;
+                }
+               
+            }
+        }
     }
 }

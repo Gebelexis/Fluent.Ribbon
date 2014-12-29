@@ -49,3 +49,4 @@ Office2013\Controls\RibbonStatusBar.xaml
 Office2013\Controls\Slider.xaml
 Office2013\RibbonWindow.xaml
 Office2013\Common.xaml
+Office2010\Controls\RibbonContentControl.xaml

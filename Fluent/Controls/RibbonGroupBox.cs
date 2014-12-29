@@ -127,6 +127,9 @@ namespace Fluent
                     continue;
                 }
 
+                if (element is System.Windows.Controls.ContentPresenter)
+                    element = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)element, 0);
+
                 RibbonProperties.SetAppropriateSize(element, groupBoxState);
             }
         }
@@ -168,7 +171,7 @@ namespace Fluent
         {
             foreach (var item in Items)
             {
-                var scalableRibbonControl = item as IScalableRibbonControl;
+                var scalableRibbonControl = GetScalableControl(item) as IScalableRibbonControl;
                 if (scalableRibbonControl == null)
                 {
                     continue;
@@ -200,7 +203,7 @@ namespace Fluent
         {
             foreach (object item in Items)
             {
-                IScalableRibbonControl scalableRibbonControl = item as IScalableRibbonControl;
+                IScalableRibbonControl scalableRibbonControl = GetScalableControl(item) as IScalableRibbonControl;
                 if (scalableRibbonControl == null) continue;
                 scalableRibbonControl.Reduce();
             }
@@ -213,8 +216,13 @@ namespace Fluent
 
         private void UpdateScalableControlSubscribing(bool registerEvents)
         {
-            foreach (var scalableRibbonControl in Items.OfType<IScalableRibbonControl>())
+            foreach (var item in Items)
             {
+                var scalableRibbonControl = GetScalableControl(item);
+                if (scalableRibbonControl == null)
+                {
+                    continue;
+                }
                 // Always unregister first to ensure that we don't subscribe twice
                 scalableRibbonControl.Scaled -= OnScalableControlScaled;
 
@@ -223,6 +231,21 @@ namespace Fluent
                     scalableRibbonControl.Scaled += OnScalableControlScaled;
                 }
             }
+        }
+
+        private IScalableRibbonControl GetScalableControl(object item)
+        {
+            var scalableRibbonControl = item as IScalableRibbonControl;
+            if (scalableRibbonControl == null && !(item is UIElement))
+            {
+                DependencyObject dObject = this.ItemContainerGenerator.ContainerFromItem(item);
+                if (dObject is System.Windows.Controls.ContentPresenter)
+                {
+                    dObject = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)dObject, 0);
+                }
+                scalableRibbonControl = dObject as IScalableRibbonControl;
+            }
+            return scalableRibbonControl;
         }
 
         #endregion
@@ -498,12 +521,17 @@ namespace Fluent
         {
             get
             {
-                ArrayList array = new ArrayList();
-                //if (parentPanel != null) array.Add(parentPanel);
-
-                array.AddRange(Items);
-                if (LauncherButton != null) array.Add(LauncherButton);
-                return array.GetEnumerator();
+                foreach (var item in this.Items)
+                {
+                    var child = item as UIElement;
+                    if (child == null)
+                        child = (UIElement)this.ItemContainerGenerator.ContainerFromItem(item);
+                    if (child is System.Windows.Controls.ContentPresenter)
+                        child = (UIElement)VisualTreeHelper.GetChild((System.Windows.Controls.ContentPresenter)child, 0);
+                    yield return child;
+                }
+                if (LauncherButton != null) 
+                    yield return LauncherButton;
             }
         }
 
@@ -1117,5 +1145,6 @@ namespace Fluent
         }
 
         #endregion
+        
     }
 }

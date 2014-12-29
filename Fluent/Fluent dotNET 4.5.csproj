@@ -85,6 +85,9 @@
     <Compile Include="Controls\ColorGallery.cs" />
     <Compile Include="Controls\ComboBox.cs" />
     <Compile Include="Controls\ContextMenu.cs" />
+    <Compile Include="Controls\RibbonContentControl.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Converters\EmptyContentToVisibilty.cs" />
     <Compile Include="Converters\EnumToEnunConverter.cs" />
     <Compile Include="Converters\GalleryGroupFilterConverter.cs" />
@@ -334,6 +337,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Include="Themes\Office2010\Controls\RibbonContentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Office2013\Controls\ApplicationMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

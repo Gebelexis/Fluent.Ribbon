@@ -140,7 +140,8 @@ namespace Fluent
                 var child = item as UIElement;
 
                 if (child == null
-                    || child.Visibility != Visibility.Visible)
+                    || child.Visibility != Visibility.Visible || !child.IsVisible
+                    || ((FrameworkElement)child).ActualWidth == 0 || ((FrameworkElement)child).ActualHeight == 0)
                 {
                     continue;
                 }
@@ -530,6 +531,16 @@ namespace Fluent
 
                 if (current is AdornerDecorator)
                 {
+                    var currentParent = (UIElement)VisualTreeHelper.GetParent(current) ?? (UIElement)LogicalTreeHelper.GetParent(current);
+                    if (currentParent is Decorator)
+                    {
+                        Decorator decorator = currentParent as Decorator;
+                        if (decorator.ClipToBounds) //fix for clipping the keytips on popups
+                        {
+                            decorator.ClipToBounds = false;
+                            decorator.Margin = new Thickness(5);
+                        }
+                    }
                     return AdornerLayer.GetAdornerLayer((UIElement)VisualTreeHelper.GetChild(current, 0));
                 }
             }

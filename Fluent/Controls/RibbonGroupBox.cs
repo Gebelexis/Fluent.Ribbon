@@ -50,6 +50,7 @@ namespace Fluent
 
         private readonly ItemContainerGeneratorAction updateChildSizesItemContainerGeneratorAction;
 
+        private double lastPanelWidth = 0;
         #endregion
 
         #region Properties
@@ -788,8 +789,14 @@ namespace Fluent
             {
                 Size result;
                 var stateScale = this.GetCurrentIntermediateStateScale();
+                double currentPanelWidth = 0;
+                if (this.upPanel != null)
+                {
+                    this.upPanel.InvalidateMeasure();
+                    currentPanelWidth = this.upPanel.ActualWidth;
+                }
 
-                if (cachedMeasures.TryGetValue(stateScale, out result) == false)
+                if (cachedMeasures.TryGetValue(stateScale, out result) == false || currentPanelWidth != lastPanelWidth)
                 {
                     this.SuppressCacheReseting = true;
                     this.UpdateScalableControlSubscribing();
@@ -801,7 +808,10 @@ namespace Fluent
                     this.Scale = this.ScaleIntermediate;
                     this.InvalidateLayout();
                     this.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
-                    this.cachedMeasures.Add(stateScale, this.DesiredSize);
+                    if (!this.cachedMeasures.ContainsKey(stateScale))
+                        this.cachedMeasures.Add(stateScale, this.DesiredSize);
+                    else
+                        this.cachedMeasures[stateScale] = this.DesiredSize;
                     result = this.DesiredSize;
 
                     // Rollback changes
@@ -813,6 +823,7 @@ namespace Fluent
                     this.SuppressCacheReseting = false;
                 }
 
+                this.lastPanelWidth = currentPanelWidth;
                 return result;
             }
         }
@@ -1145,6 +1156,12 @@ namespace Fluent
         }
 
         #endregion
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            Size measureOverride = base.MeasureOverride(constraint);
+            return measureOverride;
+        }
         
     }
 }

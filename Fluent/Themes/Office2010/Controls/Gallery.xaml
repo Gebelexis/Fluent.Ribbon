@@ -132,7 +132,7 @@
                                            Height="Auto"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Top"
-                                           Header="{TemplateBinding SelectedFilterTitle}" />
+                                           Header="{Binding SelectedFilter.Title, RelativeSource={RelativeSource TemplatedParent}}" />
                 </Border>
                 <ScrollViewer x:Name="scrollViewer"
                               Grid.RowSpan="1"

@@ -846,6 +846,10 @@
                 Value="True" />
         <Setter Property="Template"
                 Value="{DynamicResource MenuItemTemplate}" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment"
+                Value="Stretch"/>
         <Style.Triggers>
             <MultiTrigger>
                 <MultiTrigger.Conditions>

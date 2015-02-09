@@ -194,7 +194,12 @@ namespace Fluent
                         {
                             GalleryGroupFilter filter = (GalleryGroupFilter)e.NewItems[i];
                             MenuItem menuItem = new MenuItem();
-                            menuItem.Header = filter.Title;
+                            //menuItem.Header = filter.Title;
+
+                            Binding headerBinding = new Binding("Title");
+                            headerBinding.Source = filter;
+                            BindingOperations.SetBinding(menuItem, MenuItem.HeaderProperty, headerBinding);
+
                             menuItem.Tag = filter;
                             if (filter == SelectedFilter) menuItem.IsChecked = true;
                             menuItem.Click += OnFilterMenuItemClick;
@@ -226,7 +231,12 @@ namespace Fluent
                         {
                             GalleryGroupFilter filter = item;
                             MenuItem menuItem = new MenuItem();
-                            menuItem.Header = filter.Title;
+                            //menuItem.Header = filter.Title;
+
+                            Binding headerBinding = new Binding("Title");
+                            headerBinding.Source = filter;
+                            BindingOperations.SetBinding(menuItem, MenuItem.HeaderProperty, headerBinding);
+
                             menuItem.Tag = filter;
                             if (filter == SelectedFilter) menuItem.IsChecked = true;
                             menuItem.Click += OnFilterMenuItemClick;
@@ -275,7 +285,6 @@ namespace Fluent
             GalleryGroupFilter filter = e.NewValue as GalleryGroupFilter;            
             if (filter != null)
             {
-                gallery.SelectedFilterTitle = filter.Title;
                 gallery.SelectedFilterGroups = filter.Groups;
                 gallery.SelectedFilterIndex = gallery.Filters.IndexOf(filter);
                 System.Windows.Controls.MenuItem menuItem = gallery.GetFilterMenuItem(filter);
@@ -283,31 +292,11 @@ namespace Fluent
             }
             else
             {
-                gallery.SelectedFilterTitle = "";
                 gallery.SelectedFilterGroups = null;
                 gallery.SelectedFilterIndex = -1;
             }
             gallery.UpdateLayout();
-        }
-
-        /// <summary>
-        /// Gets selected filter title
-        /// </summary>
-        public string SelectedFilterTitle
-        {
-            get { return (string)GetValue(SelectedFilterTitleProperty); }
-            private set { SetValue(SelectedFilterTitlePropertyKey, value); }
-        }
-
-        private static readonly DependencyPropertyKey SelectedFilterTitlePropertyKey =
-            DependencyProperty.RegisterReadOnly("SelectedFilterTitle", typeof(string),
-            typeof(Gallery), new UIPropertyMetadata(null));
-
-        /// <summary>
-        /// Using a DependencyProperty as the backing store for SelectedFilterTitle. 
-        /// This enables animation, styling, binding, etc...
-        /// </summary>
-        public static readonly DependencyProperty SelectedFilterTitleProperty = SelectedFilterTitlePropertyKey.DependencyProperty;
+        }        
 
         /// <summary>
         /// Gets selected filter groups
@@ -360,7 +349,7 @@ namespace Fluent
         {
             if (filter == null) return null;
             if (groupsMenuButton == null) return null; 
-            return groupsMenuButton.Items.Cast<MenuItem>().FirstOrDefault(item => (item != null) && (item.Header.ToString() == filter.Title));
+            return groupsMenuButton.Items.Cast<MenuItem>().FirstOrDefault(item => (item != null) && (item.Tag == filter));
             /*foreach (MenuItem item in groupsMenuButton.Items)
             {
                 if ((item!=null)&&(item.Header == filter.Title)) return item;
@@ -563,10 +552,14 @@ namespace Fluent
                 {
                     var item = new MenuItem
                         {
-                            Header = this.Filters[i].Title,
+                            //Header = this.Filters[i].Title,
                             Tag = this.Filters[i],
                             IsDefinitive = false
                         };
+
+                    Binding headerBinding = new Binding("Title");
+                    headerBinding.Source = this.Filters[i];
+                    BindingOperations.SetBinding(item, MenuItem.HeaderProperty, headerBinding);
 
                     if (this.Filters[i] == this.SelectedFilter)
                     {

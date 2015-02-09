@@ -8,6 +8,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using System.Windows.Media.Imaging;
     using System.Windows.Threading;
     using Fluent;
     using FluentTest.ViewModels;
@@ -72,11 +73,15 @@
 
         public Button CreateRibbonButton()
         {
-            var button = new Button();
             var fooCommand1 = new FooCommand1();
-            button.Command = fooCommand1.ItemCommand;
 
-            button.Header = "Foo";
+            var button = new Button
+            {
+                Command = fooCommand1.ItemCommand,
+                Header = "Foo",
+                Icon = new BitmapImage(new Uri(@"Images\Green.png", UriKind.Relative)),
+                LargeIcon = new BitmapImage(new Uri(@"Images\GreenLarge.png", UriKind.Relative)),
+            };
 
             this.CommandBindings.Add(fooCommand1.ItemCommandBinding);
             return button;
@@ -87,7 +92,8 @@
         private enum Theme
         {
             Office2010,
-            Office2013
+            Office2013,
+            Windows8
         }
 
         private Theme? currentTheme;
@@ -111,6 +117,12 @@
         {
             this.ChangeTheme(Theme.Office2010, "pack://application:,,,/Fluent;component/Themes/Office2010/Blue.xaml");
         }
+
+        private void OnWindows8Click(object sender, RoutedEventArgs e)
+        {
+            this.ChangeTheme(Theme.Windows8, "pack://application:,,,/Fluent;component/Themes/Windows8/Silver.xaml");
+        }
+
 
         private void ChangeTheme(Theme theme, string color)
         {
@@ -147,12 +159,16 @@
                             Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/Fluent;component/Themes/Office2013/Generic.xaml") });
                             Application.Current.Resources.MergedDictionaries.RemoveAt(0);
                             break;
+                        case Theme.Windows8:
+                            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/Fluent;component/Themes/Windows8/Generic.xaml") });
+                            Application.Current.Resources.MergedDictionaries.RemoveAt(0);
+                            break;
                     }
 
                     this.currentTheme = theme;
                     Application.Current.Resources.EndInit();
 
-                    if (owner != null)
+                    if (owner is RibbonWindow)
                     {
                         owner.Style = null;
                         owner.Style = owner.FindResource("RibbonWindowStyle") as Style;
@@ -332,7 +348,11 @@
             };
 
             var group = new RibbonGroupBox();
-            group.Items.Add(this.CreateRibbonButton());
+            for (var i = 0; i < 20; i++)
+            {
+                group.Items.Add(this.CreateRibbonButton());
+            }
+
             tab.Groups.Add(group);
 
             this.ribbon.Tabs.Add(tab);
@@ -342,6 +362,11 @@
         {
             var w = new Window();
             w.ShowDialog();
+        }
+
+        private void OpenMahMetroWindow_OnClick(object sender, RoutedEventArgs e)
+        {
+            new MahMetroWindow().Show();
         }
     }
 

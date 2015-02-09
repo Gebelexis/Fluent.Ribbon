@@ -3,6 +3,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.ide
 
 # Build results
 [Dd]ebug/
@@ -34,3 +35,4 @@ publish/
 
 # Generated files
 Fluent/Themes/**/Generic.xaml
+packages/

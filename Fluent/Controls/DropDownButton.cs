@@ -545,7 +545,9 @@ namespace Fluent
 
         private void OnDropDownPopupMouseDown(object sender, RoutedEventArgs e)
         {
-            if (this.ClosePopupOnMouseDown)
+            if (this.ClosePopupOnMouseDown
+                && this.resizeBothThumb.IsMouseOver == false
+                && this.resizeVerticalThumb.IsMouseOver == false)
             {
                 e.Handled = false;
 
@@ -701,39 +703,39 @@ namespace Fluent
         // Handles resize both drag
         private void OnResizeBothDelta(object sender, DragDeltaEventArgs e)
         {
-            if (scrollViewer != null)
+            if (this.scrollViewer == null)
             {
-                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                return;
             }
 
-            if (double.IsNaN(menuPanel.Width))
+            if (double.IsNaN(this.scrollViewer.Width))
             {
-                menuPanel.Width = menuPanel.ActualWidth;
+                this.scrollViewer.Width = this.scrollViewer.ActualWidth;
             }
 
-            if (double.IsNaN(menuPanel.Height))
+            if (double.IsNaN(this.scrollViewer.Height))
             {
-                menuPanel.Height = menuPanel.ActualHeight;
+                this.scrollViewer.Height = this.scrollViewer.ActualHeight;
             }
 
-            menuPanel.Width = Math.Max(menuPanel.MinWidth, menuPanel.Width + e.HorizontalChange);
-            menuPanel.Height = Math.Min(Math.Max(menuPanel.MinHeight, menuPanel.Height + e.VerticalChange), MaxDropDownHeight);
+            this.scrollViewer.Width = Math.Max(this.ActualWidth, this.scrollViewer.Width + e.HorizontalChange);
+            this.scrollViewer.Height = Math.Min(Math.Max(this.ActualHeight, this.scrollViewer.Height + e.VerticalChange), this.MaxDropDownHeight);
         }
 
         // Handles resize vertical drag
         private void OnResizeVerticalDelta(object sender, DragDeltaEventArgs e)
         {
-            if (scrollViewer != null)
+            if (this.scrollViewer == null)
             {
-                scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                return;
             }
 
-            if (double.IsNaN(menuPanel.Height))
+            if (double.IsNaN(this.scrollViewer.Height))
             {
-                menuPanel.Height = menuPanel.ActualHeight;
+                this.scrollViewer.Height = this.scrollViewer.ActualHeight;
             }
 
-            menuPanel.Height = Math.Min(Math.Max(menuPanel.MinHeight, menuPanel.Height + e.VerticalChange), MaxDropDownHeight);
+            this.scrollViewer.Height = Math.Min(Math.Max(this.ActualHeight, this.scrollViewer.Height + e.VerticalChange), this.MaxDropDownHeight);
         }
 
         private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
